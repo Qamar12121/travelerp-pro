@@ -1,0 +1,140 @@
+// Version: 1.0.0
+type BookingStatus__96719981 = {#cancelled; #confirmed; #pending};
+type BookingType__102278699 = {#ticket; #tour; #umrah; #visa};
+type Booking__292638 =
+  {
+    airline : ?Text;
+    bookingType : BookingType__102278699;
+    clientId : EntityId__892221652;
+    createdAt : Timestamp__301639476;
+    createdBy : Principal;
+    id : EntityId__892221652;
+    invoiceId : ?EntityId__892221652;
+    netFare : Float;
+    pnr : ?Text;
+    profit : Float;
+    saleFare : Float;
+    sector : ?Text;
+    status : BookingStatus__96719981;
+    travelDate : ?Timestamp__301639476
+  };
+type ClientType__793805963 = {#client; #supplier};
+type Client__1072228534 =
+  {
+    clientType : ClientType__793805963;
+    createdAt : Timestamp__301639476;
+    email : ?Text;
+    id : EntityId__892221652;
+    name : Text;
+    openingBalance : Float;
+    phone : Text
+  };
+type Data__791452850<K, V> =
+  {var count : Nat__490723111; kvs : [var ?(K, V)]};
+type EntityId__892221652 = Text;
+type Internal__8484328<K, V> =
+  {children : [var ?Node__46230540<K, V>]; data : Data__791452850<K, V>};
+type InvoiceStatus__932546339 = {#paid; #partial; #unpaid};
+type Invoice__381079582 =
+  {
+    amount : Float;
+    bookingId : EntityId__892221652;
+    clientId : EntityId__892221652;
+    createdAt : Timestamp__301639476;
+    due : Float;
+    id : EntityId__892221652;
+    invoiceNo : Text;
+    paid : Float;
+    status : InvoiceStatus__932546339
+  };
+type Leaf__809889148<K, V> = {data : Data__791452850<K, V>};
+type LedgerEntry__443656227 =
+  {
+    balance : Float;
+    credit : Float;
+    date : Timestamp__301639476;
+    debit : Float;
+    description : Text;
+    entityId : EntityId__892221652;
+    entityType : ClientType__793805963;
+    id : EntityId__892221652;
+    voucherNo : Text;
+    voucherType : Text
+  };
+type Map__158565046<K, V> = Map__297112838<K, V>;
+type Map__297112838<K, V> =
+  {var root : Node__46230540<K, V>; var size : Nat__490723111};
+type Map__605269027<K, V> = Map__158565046<K, V>;
+type Nat__490723111 = Nat__920180692;
+type Nat__920180692 = Nat;
+type Node__46230540<K, V> =
+  {#internal : Internal__8484328<K, V>; #leaf : Leaf__809889148<K, V>};
+type PaymentMethod__46913440 = {#bank; #cash};
+type Timestamp__301639476 = Int;
+type UserRole__1054455867 = {#admin; #guest; #user};
+type VoucherEntry__342036115 =
+  {
+    accountId : EntityId__892221652;
+    accountName : Text;
+    credit : Float;
+    debit : Float
+  };
+type VoucherType__561003931 = {#contra; #journal; #payment; #receipt};
+type Voucher__468983601 =
+  {
+    amount : Float;
+    clientId : ?EntityId__892221652;
+    createdAt : Timestamp__301639476;
+    createdBy : Principal;
+    date : Timestamp__301639476;
+    entries : [VoucherEntry__342036115];
+    id : EntityId__892221652;
+    paymentMethod : ?PaymentMethod__46913440;
+    remarks : ?Text;
+    supplierId : ?EntityId__892221652;
+    voucherNo : Text;
+    voucherType : VoucherType__561003931
+  };
+actor {
+  stable accessControlState :
+    {
+      var adminAssigned : Bool;
+      userRoles : Map__605269027<Principal, UserRole__1054455867>
+    };
+  stable appSettings :
+    {
+      var agencyName : Text;
+      var currency : Text;
+      var invoiceNextNo : Nat;
+      var invoicePrefix : Text;
+      var voucherNextNo : Nat;
+      var voucherPrefix : Text
+    };
+  stable bookings :
+    {
+      var root : Node__46230540<EntityId__892221652, Booking__292638>;
+      var size : Nat__490723111
+    };
+  stable clientIdCounter : {var next : Nat};
+  stable clients :
+    {
+      var root : Node__46230540<EntityId__892221652, Client__1072228534>;
+      var size : Nat__490723111
+    };
+  stable invoices :
+    {
+      var root : Node__46230540<EntityId__892221652, Invoice__381079582>;
+      var size : Nat__490723111
+    };
+  stable ledger :
+    {
+      var blockIndex : Nat__490723111;
+      var blocks : [var [var ?LedgerEntry__443656227]];
+      var elementIndex : Nat__490723111
+    };
+  stable vouchers :
+    {
+      var root : Node__46230540<EntityId__892221652, Voucher__468983601>;
+      var size : Nat__490723111
+    }
+};

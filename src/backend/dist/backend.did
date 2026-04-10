@@ -1,0 +1,212 @@
+type VoucherType = 
+ variant {
+   contra;
+   journal;
+   payment;
+   receipt;
+ };
+type VoucherEntry = 
+ record {
+   accountId: EntityId;
+   accountName: text;
+   credit: float64;
+   debit: float64;
+ };
+type Voucher = 
+ record {
+   amount: float64;
+   clientId: opt EntityId;
+   createdAt: Timestamp;
+   createdBy: principal;
+   date: Timestamp;
+   entries: vec VoucherEntry;
+   id: EntityId;
+   paymentMethod: opt PaymentMethod;
+   remarks: opt text;
+   supplierId: opt EntityId;
+   voucherNo: text;
+   voucherType: VoucherType;
+ };
+type UserRole = 
+ variant {
+   admin;
+   guest;
+   user;
+ };
+type TrialBalanceEntry = 
+ record {
+   accountName: text;
+   credit: float64;
+   debit: float64;
+ };
+type Timestamp = int;
+type Settings = 
+ record {
+   agencyName: text;
+   currency: text;
+   invoiceNextNo: nat;
+   invoicePrefix: text;
+   voucherNextNo: nat;
+   voucherPrefix: text;
+ };
+type Result_1 = 
+ variant {
+   err: text;
+   ok: text;
+ };
+type Result = 
+ variant {
+   err: text;
+   ok;
+ };
+type ProfitLossReport = 
+ record {
+   grossProfit: float64;
+   netProfit: float64;
+   totalCost: float64;
+   totalSales: float64;
+ };
+type PaymentMethod = 
+ variant {
+   bank;
+   cash;
+ };
+type OutstandingEntry = 
+ record {
+   amount: float64;
+   clientName: text;
+   due: float64;
+   invoiceNo: text;
+   paid: float64;
+ };
+type LedgerEntry = 
+ record {
+   balance: float64;
+   credit: float64;
+   date: Timestamp;
+   debit: float64;
+   description: text;
+   entityId: EntityId;
+   entityType: ClientType;
+   id: EntityId;
+   voucherNo: text;
+   voucherType: text;
+ };
+type InvoiceStatus = 
+ variant {
+   paid;
+   partial;
+   unpaid;
+ };
+type Invoice = 
+ record {
+   amount: float64;
+   bookingId: EntityId;
+   clientId: EntityId;
+   createdAt: Timestamp;
+   due: float64;
+   id: EntityId;
+   invoiceNo: text;
+   paid: float64;
+   status: InvoiceStatus;
+ };
+type EntityId = text;
+type DashboardStats = 
+ record {
+   todayTransactions: nat;
+   totalPayable: float64;
+   totalProfit: float64;
+   totalReceivable: float64;
+   totalSales: float64;
+ };
+type ClientType = 
+ variant {
+   client;
+   supplier;
+ };
+type Client = 
+ record {
+   clientType: ClientType;
+   createdAt: Timestamp;
+   email: opt text;
+   id: EntityId;
+   name: text;
+   openingBalance: float64;
+   phone: text;
+ };
+type BookingType = 
+ variant {
+   ticket;
+   tour;
+   umrah;
+   visa;
+ };
+type BookingStatus = 
+ variant {
+   cancelled;
+   confirmed;
+   pending;
+ };
+type Booking = 
+ record {
+   airline: opt text;
+   bookingType: BookingType;
+   clientId: EntityId;
+   createdAt: Timestamp;
+   createdBy: principal;
+   id: EntityId;
+   invoiceId: opt EntityId;
+   netFare: float64;
+   pnr: opt text;
+   profit: float64;
+   saleFare: float64;
+   sector: opt text;
+   status: BookingStatus;
+   travelDate: opt Timestamp;
+ };
+service : {
+  _initializeAccessControl: () -> ();
+  addBooking: (clientId: EntityId, bookingType: BookingType, pnr: opt text,
+   sector: opt text, airline: opt text, travelDate: opt Timestamp, netFare:
+   float64, saleFare: float64) -> (Result_1);
+  addClient: (name: text, phone: text, email: opt text, openingBalance:
+   float64, clientType: ClientType) -> (Result_1);
+  addContraVoucher: (date: Timestamp, fromAccount: text, toAccount: text,
+   amount: float64, remarks: opt text) -> (Result_1);
+  addJournalVoucher: (date: Timestamp, entries: vec VoucherEntry, remarks:
+   opt text) -> (Result_1);
+  addPaymentVoucher: (date: Timestamp, supplierId: EntityId, amount: 
+   float64, paymentMethod: PaymentMethod, remarks: opt text) -> (Result_1);
+  addReceiptVoucher: (date: Timestamp, clientId: EntityId, amount: float64,
+   paymentMethod: PaymentMethod, remarks: opt text) -> (Result_1);
+  assignCallerUserRole: (user: principal, role: UserRole) -> ();
+  deleteClient: (id: EntityId) -> (Result);
+  getBookingById: (id: EntityId) -> (opt Booking) query;
+  getBookings: () -> (vec Booking) query;
+  getCallerUserRole: () -> (UserRole) query;
+  getClientById: (id: EntityId) -> (opt Client) query;
+  getClients: () -> (vec Client) query;
+  getDashboardStats: () -> (DashboardStats) query;
+  getInvoiceById: (id: EntityId) -> (opt Invoice) query;
+  getInvoices: () -> (vec Invoice) query;
+  getInvoicesByClient: (clientId: EntityId) -> (vec Invoice) query;
+  getLedgerByEntity: (entityId: EntityId) -> (vec LedgerEntry) query;
+  getOutstandingReport: () -> (vec OutstandingEntry) query;
+  getProfitLossReport: () -> (ProfitLossReport) query;
+  getRunningBalance: (entityId: EntityId) -> (float64) query;
+  getSettings: () -> (Settings) query;
+  getSuppliers: () -> (vec Client) query;
+  getTrialBalance: () -> (vec TrialBalanceEntry) query;
+  getVouchers: () -> (vec Voucher) query;
+  getVouchersByType: (voucherType: VoucherType) -> (vec Voucher) query;
+  isCallerAdmin: () -> (bool) query;
+  updateBooking: (id: EntityId, clientId: EntityId, bookingType: BookingType,
+   pnr: opt text, sector: opt text, airline: opt text, travelDate:
+   opt Timestamp, netFare: float64, saleFare: float64, status:
+   BookingStatus) -> (Result);
+  updateClient: (id: EntityId, name: text, phone: text, email: opt text,
+   openingBalance: float64) -> (Result);
+  updateSettings: (currency: text, invoicePrefix: text, invoiceNextNo: 
+   nat, voucherPrefix: text, voucherNextNo: nat, agencyName: text) ->
+   (Result);
+}

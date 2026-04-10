@@ -1,0 +1,28 @@
+{
+  "overview": "Enterprise-level Travel Accounting ERP SaaS Platform for travel agencies. Manage flight bookings, visa/umrah packages, full double-entry accounting, vouchers, ledger, commission tracking, and financial reports — all with a stunning luxury black & gold UI.",
+  "features": [
+    "Dashboard with KPI cards (Sales, Profit, Receivable, Payable)",
+    "Bookings management with auto invoice & journal voucher creation",
+    "Invoices with print and PDF download",
+    "Vouchers: Receipt, Payment, Journal, Contra (full double-entry)",
+    "Ledger with running balance per client/supplier",
+    "Clients & Suppliers CRUD management",
+    "Reports: Profit & Loss, Trial Balance, Outstanding balances",
+    "Settings: currency, invoice & voucher numbering",
+    "Role-based auth: Admin, Accountant, Agent",
+    "Luxury black & gold glassmorphism UI with smooth animations"
+  ],
+  "category": "finance-accounting",
+  "tags": [
+    "travel",
+    "erp",
+    "accounting",
+    "invoicing",
+    "vouchers",
+    "ledger",
+    "saas",
+    "double-entry",
+    "finance"
+  ],
+  "last_updated": "2026-04-10T10:43:52.849Z"
+}

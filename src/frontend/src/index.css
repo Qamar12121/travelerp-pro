@@ -1,0 +1,211 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-display: Fraunces;
+    --font-body: Figtree;
+    --font-mono: GeistMono;
+    --radius: 0.75rem;
+
+    /* Light mode — kept but app always runs dark */
+    --background: 0.99 0 0;
+    --foreground: 0.15 0 0;
+    --card: 1.0 0 0;
+    --card-foreground: 0.15 0 0;
+    --popover: 1.0 0 0;
+    --popover-foreground: 0.15 0 0;
+    --primary: 0.72 0.15 82;
+    --primary-foreground: 0.08 0 0;
+    --secondary: 0.95 0 0;
+    --secondary-foreground: 0.25 0 0;
+    --muted: 0.95 0 0;
+    --muted-foreground: 0.5 0 0;
+    --accent: 0.72 0.15 82;
+    --accent-foreground: 0.08 0 0;
+    --destructive: 0.55 0.22 25;
+    --destructive-foreground: 0.98 0 0;
+    --border: 0.88 0 0;
+    --input: 0.88 0 0;
+    --ring: 0.72 0.15 82;
+    --chart-1: 0.72 0.15 82;
+    --chart-2: 0.6 0.12 185;
+    --chart-3: 0.4 0.07 227;
+    --chart-4: 0.65 0.19 84;
+    --chart-5: 0.77 0.19 70;
+    --sidebar: 0.98 0 0;
+    --sidebar-foreground: 0.15 0 0;
+    --sidebar-primary: 0.72 0.15 82;
+    --sidebar-primary-foreground: 0.08 0 0;
+    --sidebar-accent: 0.72 0.15 82;
+    --sidebar-accent-foreground: 0.08 0 0;
+    --sidebar-border: 0.88 0 0;
+    --sidebar-ring: 0.72 0.15 82;
+  }
+
+  .dark {
+    /* Black #0A0A0A → oklch(0.085 0 0) */
+    --background: 0.085 0 0;
+    /* Dark Grey #1A1A1A → oklch(0.13 0 0) */
+    --foreground: 0.93 0 0;
+    --card: 0.12 0 0;
+    --card-foreground: 0.93 0 0;
+    --popover: 0.15 0 0;
+    --popover-foreground: 0.93 0 0;
+
+    /* Gold #D4AF37 → oklch(0.75 0.15 82) */
+    --primary: 0.75 0.15 82;
+    --primary-foreground: 0.085 0 0;
+
+    --secondary: 0.17 0 0;
+    --secondary-foreground: 0.85 0 0;
+    --muted: 0.16 0 0;
+    --muted-foreground: 0.52 0 0;
+
+    --accent: 0.75 0.15 82;
+    --accent-foreground: 0.085 0 0;
+
+    --destructive: 0.62 0.22 22;
+    --destructive-foreground: 0.93 0 0;
+
+    --border: 0.2 0 0;
+    --input: 0.2 0 0;
+    --ring: 0.75 0.15 82;
+
+    --chart-1: 0.75 0.15 82;
+    --chart-2: 0.7 0.17 162;
+    --chart-3: 0.77 0.19 70;
+    --chart-4: 0.63 0.27 304;
+    --chart-5: 0.65 0.25 16;
+
+    --sidebar: 0.11 0 0;
+    --sidebar-foreground: 0.93 0 0;
+    --sidebar-primary: 0.75 0.15 82;
+    --sidebar-primary-foreground: 0.085 0 0;
+    --sidebar-accent: 0.75 0.15 82;
+    --sidebar-accent-foreground: 0.085 0 0;
+    --sidebar-border: 0.2 0 0;
+    --sidebar-ring: 0.75 0.15 82;
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+}
+
+@font-face {
+  font-family: Fraunces;
+  src: url("/assets/fonts/Fraunces.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: Figtree;
+  src: url("/assets/fonts/Figtree.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: GeistMono;
+  src: url("/assets/fonts/GeistMono.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+}
+
+@layer utilities {
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass {
+    @apply backdrop-blur-md border border-white/5;
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .glass-card {
+    @apply rounded-xl border transition-smooth;
+    border-color: oklch(0.75 0.15 82 / 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(16px);
+  }
+
+  .glass-card:hover {
+    border-color: oklch(0.75 0.15 82 / 0.35);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+
+  .gold-glow {
+    transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 20px oklch(0.75 0.15 82 / 0.1);
+  }
+
+  .gold-glow:hover {
+    box-shadow: 0 0 35px oklch(0.75 0.15 82 / 0.25);
+  }
+
+  .gold-border {
+    border-color: oklch(0.75 0.15 82 / 0.4);
+  }
+
+  .sidebar-item {
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-lg text-muted-foreground transition-smooth cursor-pointer;
+  }
+
+  .sidebar-item:hover {
+    @apply text-foreground;
+    background: oklch(0.75 0.15 82 / 0.06);
+  }
+
+  .sidebar-item.active {
+    @apply text-accent font-medium;
+    background: oklch(0.75 0.15 82 / 0.08);
+    border-left: 2px solid oklch(0.75 0.15 82);
+    padding-left: calc(1rem - 2px);
+  }
+
+  .stat-card {
+    @apply glass-card p-5 gold-glow;
+  }
+
+  .data-row {
+    @apply transition-smooth;
+    border-bottom: 1px solid oklch(0.2 0 0 / 0.5);
+  }
+
+  .data-row:hover {
+    background: oklch(0.75 0.15 82 / 0.04);
+  }
+
+  .badge-paid {
+    @apply text-xs font-medium px-2 py-0.5 rounded-full;
+    color: oklch(0.75 0.18 150);
+    background: oklch(0.75 0.18 150 / 0.15);
+  }
+
+  .badge-pending {
+    @apply text-xs font-medium px-2 py-0.5 rounded-full;
+    color: oklch(0.75 0.15 82);
+    background: oklch(0.75 0.15 82 / 0.15);
+  }
+
+  .badge-overdue {
+    @apply text-xs font-medium px-2 py-0.5 rounded-full;
+    color: oklch(0.65 0.22 22);
+    background: oklch(0.65 0.22 22 / 0.15);
+  }
+
+  .badge-confirmed {
+    @apply badge-paid;
+  }
+
+  .badge-cancelled {
+    @apply badge-overdue;
+  }
+}
