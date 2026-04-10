@@ -15,6 +15,7 @@ import {
   Bell,
   BookMarked,
   BookOpen,
+  Building,
   Building2,
   ChevronDown,
   FileText,
@@ -25,28 +26,43 @@ import {
   Receipt,
   Search,
   Settings,
+  Shield,
+  User,
   Users,
   X,
 } from "lucide-react";
 import { useState } from "react";
+import { useUnreadNotificationCount } from "../hooks/useBackend";
 import { useAuthStore } from "../store/auth";
 
-const NAV_ITEMS = [
+const BASE_NAV_ITEMS = [
   { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { label: "Bookings", path: "/bookings", icon: BookOpen },
   { label: "Invoices", path: "/invoices", icon: FileText },
   { label: "Vouchers", path: "/vouchers", icon: Receipt },
+  { label: "Hotel Vouchers", path: "/hotel-vouchers", icon: Building },
   { label: "Ledger", path: "/ledger", icon: BookMarked },
   { label: "Clients", path: "/clients", icon: Users },
   { label: "Suppliers", path: "/suppliers", icon: Building2 },
   { label: "Reports", path: "/reports", icon: BarChart3 },
   { label: "Settings", path: "/settings", icon: Settings },
+  { label: "Profile", path: "/profile", icon: User },
 ];
 
 const ROLE_COLORS: Record<string, string> = {
   admin: "text-accent",
   accountant: "text-blue-400",
-  agent: "text-green-400",
+  agent: "text-emerald-400",
+  "agency-owner": "text-accent",
+  "super-admin": "text-red-400",
+};
+
+const ROLE_BADGE_STYLES: Record<string, string> = {
+  admin: "border-accent/40 text-accent",
+  accountant: "border-blue-400/40 text-blue-400",
+  agent: "border-emerald-400/40 text-emerald-400",
+  "agency-owner": "border-accent/40 text-accent",
+  "super-admin": "border-red-400/40 text-red-400",
 };
 
 interface LayoutProps {
@@ -57,9 +73,24 @@ interface LayoutProps {
 export function Layout({ children, title }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { clear } = useInternetIdentity();
-  const { role, principal, logout } = useAuthStore();
+  const { role, principal, logout, isAgencyOwner, isSuperAdmin, agencyName } =
+    useAuthStore();
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
+  const { data: unreadCount } = useUnreadNotificationCount();
+
+  const unread = unreadCount !== undefined ? Number(unreadCount) : 0;
+
+  // Build nav items dynamically based on role flags
+  const navItems = [
+    ...BASE_NAV_ITEMS,
+    ...(isAgencyOwner
+      ? [{ label: "Manage Agents", path: "/agents", icon: Users }]
+      : []),
+    ...(isSuperAdmin
+      ? [{ label: "Admin Panel", path: "/admin", icon: Shield }]
+      : []),
+  ];
 
   const handleLogout = () => {
     clear();
@@ -70,10 +101,19 @@ export function Layout({ children, title }: LayoutProps) {
     ? `${principal.slice(0, 5)}...${principal.slice(-3)}`
     : "Anonymous";
 
+  const displayName = agencyName ?? shortPrincipal;
+
   const pageTitle =
     title ??
-    NAV_ITEMS.find((n) => currentPath.startsWith(n.path))?.label ??
+    navItems.find((n) => currentPath.startsWith(n.path))?.label ??
     "Dashboard";
+
+  const roleLabel =
+    role === "agency-owner"
+      ? "Agency Owner"
+      : role === "super-admin"
+        ? "Super Admin"
+        : (role ?? "");
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
@@ -131,7 +171,7 @@ export function Layout({ children, title }: LayoutProps) {
             Main Menu
           </p>
           <ul className="space-y-0.5">
-            {NAV_ITEMS.map(({ label, path, icon: Icon }) => {
+            {navItems.map(({ label, path, icon: Icon }) => {
               const isActive =
                 currentPath === path || currentPath.startsWith(`${path}/`);
               return (
@@ -140,7 +180,7 @@ export function Layout({ children, title }: LayoutProps) {
                     to={path}
                     className={`sidebar-item ${isActive ? "active" : ""}`}
                     onClick={() => setSidebarOpen(false)}
-                    data-ocid={`nav-${label.toLowerCase()}`}
+                    data-ocid={`nav-${label.toLowerCase().replace(/\s+/g, "-")}`}
                   >
                     <Icon className="w-4 h-4 flex-shrink-0" />
                     <span className="text-sm">{label}</span>
@@ -149,6 +189,43 @@ export function Layout({ children, title }: LayoutProps) {
               );
             })}
           </ul>
+
+          {/* Notifications link in sidebar */}
+          <div className="mt-3 pt-3 border-t border-border/20">
+            <Link
+              to="/notifications"
+              className={`sidebar-item ${currentPath === "/notifications" ? "active" : ""}`}
+              onClick={() => setSidebarOpen(false)}
+              data-ocid="nav-notifications"
+            >
+              <div className="relative">
+                <Bell className="w-4 h-4 flex-shrink-0" />
+                {unread > 0 && (
+                  <span
+                    className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] font-bold"
+                    style={{
+                      background: "oklch(0.75 0.15 82)",
+                      color: "oklch(0.085 0 0)",
+                    }}
+                  >
+                    {unread > 9 ? "9+" : unread}
+                  </span>
+                )}
+              </div>
+              <span className="text-sm">Notifications</span>
+              {unread > 0 && (
+                <span
+                  className="ml-auto text-xs font-medium px-1.5 py-0.5 rounded-full"
+                  style={{
+                    background: "oklch(0.75 0.15 82 / 0.15)",
+                    color: "oklch(0.75 0.15 82)",
+                  }}
+                >
+                  {unread}
+                </span>
+              )}
+            </Link>
+          </div>
         </nav>
 
         {/* User info at bottom */}
@@ -162,13 +239,13 @@ export function Layout({ children, title }: LayoutProps) {
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-xs font-medium text-foreground truncate">
-                {shortPrincipal}
+                {agencyName ?? shortPrincipal}
               </p>
               {role && (
                 <p
                   className={`text-xs capitalize ${ROLE_COLORS[role] ?? "text-muted-foreground"}`}
                 >
-                  {role}
+                  {roleLabel}
                 </p>
               )}
             </div>
@@ -217,19 +294,31 @@ export function Layout({ children, title }: LayoutProps) {
           </div>
 
           <div className="flex items-center gap-3 ml-auto">
-            {/* Notifications */}
-            <button
-              type="button"
+            {/* Notifications bell */}
+            <Link
+              to="/notifications"
               className="relative w-9 h-9 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-smooth"
-              aria-label="Notifications"
+              aria-label={`Notifications${unread > 0 ? ` (${unread} unread)` : ""}`}
               data-ocid="topbar-notifications"
             >
               <Bell className="w-4 h-4" />
-              <span
-                className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full"
-                style={{ background: "oklch(0.75 0.15 82)" }}
-              />
-            </button>
+              {unread > 0 ? (
+                <span
+                  className="absolute top-1.5 right-1.5 min-w-[16px] h-4 rounded-full flex items-center justify-center text-[9px] font-bold px-1"
+                  style={{
+                    background: "oklch(0.75 0.15 82)",
+                    color: "oklch(0.085 0 0)",
+                  }}
+                >
+                  {unread > 9 ? "9+" : unread}
+                </span>
+              ) : (
+                <span
+                  className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full"
+                  style={{ background: "oklch(0.75 0.15 82)" }}
+                />
+              )}
+            </Link>
 
             {/* Profile dropdown */}
             <DropdownMenu>
@@ -245,15 +334,19 @@ export function Layout({ children, title }: LayoutProps) {
                   >
                     {shortPrincipal.slice(0, 2).toUpperCase()}
                   </div>
-                  <span className="hidden sm:block text-foreground truncate max-w-20">
-                    {shortPrincipal}
+                  <span className="hidden sm:block text-foreground truncate max-w-28">
+                    {displayName}
                   </span>
                   {role && (
                     <Badge
                       variant="outline"
-                      className={`hidden sm:inline-flex text-xs border-current ${ROLE_COLORS[role] ?? ""}`}
+                      className={`hidden sm:inline-flex text-xs ${ROLE_BADGE_STYLES[role] ?? ""}`}
                     >
-                      {role}
+                      {role === "agency-owner"
+                        ? "Owner"
+                        : role === "super-admin"
+                          ? "Super Admin"
+                          : role}
                     </Badge>
                   )}
                   <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
@@ -261,14 +354,81 @@ export function Layout({ children, title }: LayoutProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="w-48 bg-popover border-border/50"
+                className="w-52 bg-popover border-border/50"
               >
+                {agencyName && (
+                  <>
+                    <DropdownMenuItem
+                      className="text-xs text-muted-foreground"
+                      disabled
+                    >
+                      {agencyName}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
                 <DropdownMenuItem
-                  className="text-sm text-muted-foreground"
+                  className="text-xs text-muted-foreground"
                   disabled
                 >
                   {shortPrincipal}
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  asChild
+                  className="text-sm cursor-pointer"
+                  data-ocid="profile-link"
+                >
+                  <Link to="/profile">
+                    <User className="w-3.5 h-3.5 mr-2" />
+                    My Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  asChild
+                  className="text-sm cursor-pointer"
+                  data-ocid="notifications-link"
+                >
+                  <Link to="/notifications">
+                    <Bell className="w-3.5 h-3.5 mr-2" />
+                    Notifications
+                    {unread > 0 && (
+                      <span
+                        className="ml-auto text-xs font-medium px-1.5 py-0.5 rounded-full"
+                        style={{
+                          background: "oklch(0.75 0.15 82 / 0.15)",
+                          color: "oklch(0.75 0.15 82)",
+                        }}
+                      >
+                        {unread}
+                      </span>
+                    )}
+                  </Link>
+                </DropdownMenuItem>
+                {isAgencyOwner && (
+                  <DropdownMenuItem
+                    asChild
+                    className="text-sm cursor-pointer"
+                    data-ocid="agents-link"
+                  >
+                    <Link to="/agents">
+                      <Users className="w-3.5 h-3.5 mr-2" />
+                      Manage Agents
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                {isSuperAdmin && (
+                  <DropdownMenuItem
+                    asChild
+                    className="text-sm cursor-pointer"
+                    data-ocid="admin-link"
+                  >
+                    <Link to="/admin">
+                      <Shield className="w-3.5 h-3.5 mr-2" />
+                      Admin Panel
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={handleLogout}

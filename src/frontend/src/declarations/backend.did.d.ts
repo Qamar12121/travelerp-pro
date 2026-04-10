@@ -10,6 +10,65 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface ActivityLogEntry {
+  'id' : EntityId,
+  'description' : string,
+  'agencyId' : EntityId,
+  'actorId' : [] | [string],
+  'timestamp' : Timestamp,
+  'eventType' : string,
+}
+export type AdvanceType = { 'paid' : null } |
+  { 'received' : null };
+export interface AdvanceVoucher {
+  'id' : EntityId,
+  'linkedClientId' : [] | [EntityId],
+  'clientId' : [] | [EntityId],
+  'linkedSupplierId' : [] | [EntityId],
+  'paymentMethod' : [] | [PaymentMethod],
+  'date' : Timestamp,
+  'createdAt' : Timestamp,
+  'createdBy' : Principal,
+  'entries' : Array<VoucherEntry>,
+  'advanceType' : [] | [AdvanceType],
+  'voucherNo' : string,
+  'amount' : number,
+  'supplierId' : [] | [EntityId],
+  'remarks' : [] | [string],
+}
+export interface Agency {
+  'id' : EntityId,
+  'timezone' : [] | [string],
+  'country' : [] | [string],
+  'totalAgents' : bigint,
+  'ownerPrincipal' : Principal,
+  'createdAt' : Timestamp,
+  'isOnboarded' : boolean,
+  'isActive' : boolean,
+  'logoUrl' : [] | [string],
+  'agencyName' : string,
+  'phone' : [] | [string],
+}
+export interface AgencyStats {
+  'totalBookings' : bigint,
+  'totalProfit' : number,
+  'activeAgents' : bigint,
+  'totalRevenue' : number,
+  'lastActivityAt' : [] | [Timestamp],
+}
+export interface AgentProfile {
+  'id' : EntityId,
+  'principal' : [] | [Principal],
+  'name' : string,
+  'createdAt' : Timestamp,
+  'createdBy' : Principal,
+  'role' : AgentRole,
+  'agencyId' : EntityId,
+  'isActive' : boolean,
+  'email' : string,
+}
+export type AgentRole = { 'agent' : null } |
+  { 'owner' : null };
 export interface Booking {
   'id' : EntityId,
   'pnr' : [] | [string],
@@ -42,8 +101,22 @@ export interface Client {
   'openingBalance' : number,
   'phone' : string,
 }
+export interface ClientLedgerSummary {
+  'totalCredit' : number,
+  'closingBalance' : number,
+  'entityId' : EntityId,
+  'openingBalance' : number,
+  'entityName' : string,
+  'totalDebit' : number,
+}
 export type ClientType = { 'client' : null } |
   { 'supplier' : null };
+export interface DailyLedgerSummary {
+  'totalCredit' : number,
+  'date' : string,
+  'netBalance' : number,
+  'totalDebit' : number,
+}
 export interface DashboardStats {
   'todayTransactions' : bigint,
   'totalReceivable' : number,
@@ -52,20 +125,73 @@ export interface DashboardStats {
   'totalPayable' : number,
 }
 export type EntityId = string;
+export interface HotelVoucher {
+  'id' : EntityId,
+  'clientId' : EntityId,
+  'date' : Timestamp,
+  'createdAt' : Timestamp,
+  'createdBy' : string,
+  'agentId' : [] | [EntityId],
+  'agencyId' : EntityId,
+  'totalAmount' : number,
+  'voucherNo' : string,
+  'hotels' : Array<HotelVoucherLine>,
+  'remarks' : [] | [string],
+}
+export interface HotelVoucherLine {
+  'checkIn' : Timestamp,
+  'hotelName' : string,
+  'confirmationNo' : string,
+  'city' : string,
+  'guestName' : string,
+  'ratePerNight' : number,
+  'totalAmount' : number,
+  'checkOut' : Timestamp,
+  'nights' : bigint,
+  'roomType' : string,
+  'supplierId' : EntityId,
+}
+export interface InAppNotification {
+  'id' : EntityId,
+  'title' : string,
+  'notificationType' : NotificationType,
+  'createdAt' : Timestamp,
+  'agencyId' : EntityId,
+  'isRead' : boolean,
+  'message' : string,
+  'relatedId' : [] | [string],
+}
 export interface Invoice {
   'id' : EntityId,
   'due' : number,
   'status' : InvoiceStatus,
   'clientId' : EntityId,
   'bookingId' : EntityId,
+  'discountAmount' : number,
   'createdAt' : Timestamp,
   'paid' : number,
   'invoiceNo' : string,
+  'invoiceType' : InvoiceType,
+  'notes' : [] | [string],
+  'taxAmount' : number,
   'amount' : number,
+  'refundedInvoiceId' : [] | [string],
+  'remarks' : [] | [string],
 }
 export type InvoiceStatus = { 'paid' : null } |
   { 'unpaid' : null } |
   { 'partial' : null };
+export type InvoiceType = { 'creditNote' : null } |
+  { 'booking' : null } |
+  { 'manual' : null } |
+  { 'debitNote' : null } |
+  { 'proforma' : null };
+export interface InvoicesSummary {
+  'totalPaid' : number,
+  'totalDue' : number,
+  'totalAmount' : number,
+  'totalInvoices' : bigint,
+}
 export interface LedgerEntry {
   'id' : EntityId,
   'balance' : number,
@@ -78,6 +204,11 @@ export interface LedgerEntry {
   'voucherNo' : string,
   'debit' : number,
 }
+export type NotificationType = { 'refundCreated' : null } |
+  { 'systemAlert' : null } |
+  { 'invoiceOverdue' : null } |
+  { 'bookingConfirmed' : null } |
+  { 'paymentReceived' : null };
 export interface OutstandingEntry {
   'due' : number,
   'clientName' : string,
@@ -87,17 +218,49 @@ export interface OutstandingEntry {
 }
 export type PaymentMethod = { 'bank' : null } |
   { 'cash' : null };
+export interface PlatformStats {
+  'refundRate' : number,
+  'activeAgencies' : bigint,
+  'totalAgencies' : bigint,
+  'totalRefunds' : number,
+  'totalRevenue' : number,
+}
 export interface ProfitLossReport {
   'grossProfit' : number,
   'totalCost' : number,
   'totalSales' : number,
   'netProfit' : number,
 }
+export interface RefundRequest {
+  'refundAmount' : number,
+  'invoiceId' : EntityId,
+  'refundDate' : Timestamp,
+  'reason' : string,
+}
 export type Result = { 'ok' : null } |
   { 'err' : string };
-export type Result_1 = { 'ok' : string } |
+export type Result_1 = { 'ok' : Agency } |
+  { 'err' : string };
+export type Result_10 = { 'ok' : AgentProfile } |
+  { 'err' : string };
+export type Result_2 = { 'ok' : AdvanceVoucher } |
+  { 'err' : string };
+export type Result_3 = { 'ok' : PlatformStats } |
+  { 'err' : string };
+export type Result_4 = { 'ok' : Array<AgentProfile> } |
+  { 'err' : string };
+export type Result_5 = { 'ok' : Array<Agency> } |
+  { 'err' : string };
+export type Result_6 = { 'ok' : AgencyStats } |
+  { 'err' : string };
+export type Result_7 = { 'ok' : Array<ActivityLogEntry> } |
+  { 'err' : string };
+export type Result_8 = { 'ok' : Invoice } |
+  { 'err' : string };
+export type Result_9 = { 'ok' : string } |
   { 'err' : string };
 export interface Settings {
+  'hotelVoucherNextNo' : bigint,
   'invoiceNextNo' : bigint,
   'voucherNextNo' : bigint,
   'invoicePrefix' : string,
@@ -138,8 +301,38 @@ export type VoucherType = { 'receipt' : null } |
   { 'journal' : null } |
   { 'contra' : null } |
   { 'payment' : null };
+export interface VouchersSummary {
+  'totalReceipts' : number,
+  'totalPayments' : number,
+  'totalAdvances' : number,
+  'totalVouchers' : bigint,
+}
+export interface WeeklyLedgerSummary {
+  'endDate' : string,
+  'totalCredit' : number,
+  'netBalance' : number,
+  'weekLabel' : string,
+  'totalDebit' : number,
+  'startDate' : string,
+}
 export interface _SERVICE {
   '_initializeAccessControl' : ActorMethod<[], undefined>,
+  'addAdvanceVoucher' : ActorMethod<
+    [
+      Timestamp,
+      [] | [EntityId],
+      [] | [EntityId],
+      [] | [EntityId],
+      [] | [EntityId],
+      [] | [AdvanceType],
+      number,
+      [] | [PaymentMethod],
+      [] | [string],
+      Array<VoucherEntry>,
+    ],
+    Result_2
+  >,
+  'addAgent' : ActorMethod<[string, string], Result_10>,
   'addBooking' : ActorMethod<
     [
       EntityId,
@@ -151,49 +344,125 @@ export interface _SERVICE {
       number,
       number,
     ],
-    Result_1
+    Result_9
   >,
   'addClient' : ActorMethod<
     [string, string, [] | [string], number, ClientType],
-    Result_1
+    Result_9
   >,
   'addContraVoucher' : ActorMethod<
     [Timestamp, string, string, number, [] | [string]],
-    Result_1
+    Result_9
+  >,
+  'addHotelVoucher' : ActorMethod<
+    [
+      EntityId,
+      EntityId,
+      [] | [EntityId],
+      Timestamp,
+      Array<HotelVoucherLine>,
+      [] | [string],
+    ],
+    HotelVoucher
   >,
   'addJournalVoucher' : ActorMethod<
     [Timestamp, Array<VoucherEntry>, [] | [string]],
-    Result_1
+    Result_9
   >,
   'addPaymentVoucher' : ActorMethod<
     [Timestamp, EntityId, number, PaymentMethod, [] | [string]],
-    Result_1
+    Result_9
   >,
   'addReceiptVoucher' : ActorMethod<
     [Timestamp, EntityId, number, PaymentMethod, [] | [string]],
-    Result_1
+    Result_9
   >,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'completeOnboarding' : ActorMethod<
+    [[] | [string], [] | [string], [] | [string]],
+    Result_1
+  >,
+  'createAgency' : ActorMethod<[string], Result_1>,
+  'createRefundInvoice' : ActorMethod<[EntityId, RefundRequest], Result_8>,
+  'deleteAdvanceVoucher' : ActorMethod<[EntityId], Result>,
+  'deleteBooking' : ActorMethod<[EntityId], Result>,
   'deleteClient' : ActorMethod<[EntityId], Result>,
+  'deleteHotelVoucher' : ActorMethod<[EntityId], boolean>,
+  'deleteInvoice' : ActorMethod<[EntityId], Result>,
+  'deleteNotification' : ActorMethod<[EntityId], boolean>,
+  'deleteVoucher' : ActorMethod<[EntityId], Result>,
+  'getAdvanceVoucherById' : ActorMethod<[EntityId], [] | [AdvanceVoucher]>,
+  'getAdvanceVouchers' : ActorMethod<[], Array<AdvanceVoucher>>,
+  'getAgencyActivityLog' : ActorMethod<[EntityId], Result_7>,
+  'getAgencyStats' : ActorMethod<[EntityId], Result_6>,
+  'getAgentProfile' : ActorMethod<[], [] | [AgentProfile]>,
+  'getAllAgencies' : ActorMethod<[], Result_5>,
   'getBookingById' : ActorMethod<[EntityId], [] | [Booking]>,
   'getBookings' : ActorMethod<[], Array<Booking>>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getClientById' : ActorMethod<[EntityId], [] | [Client]>,
+  'getClientLedgerSummaries' : ActorMethod<[], Array<ClientLedgerSummary>>,
   'getClients' : ActorMethod<[], Array<Client>>,
+  'getDailyLedgerSummary' : ActorMethod<
+    [Timestamp, Timestamp],
+    Array<DailyLedgerSummary>
+  >,
   'getDashboardStats' : ActorMethod<[], DashboardStats>,
+  'getHotelVoucherById' : ActorMethod<[EntityId], [] | [HotelVoucher]>,
+  'getHotelVouchers' : ActorMethod<[EntityId], Array<HotelVoucher>>,
   'getInvoiceById' : ActorMethod<[EntityId], [] | [Invoice]>,
   'getInvoices' : ActorMethod<[], Array<Invoice>>,
   'getInvoicesByClient' : ActorMethod<[EntityId], Array<Invoice>>,
+  'getInvoicesByStatus' : ActorMethod<[InvoiceStatus], Array<Invoice>>,
+  'getInvoicesByType' : ActorMethod<[InvoiceType], Array<Invoice>>,
+  'getInvoicesSummary' : ActorMethod<[], InvoicesSummary>,
   'getLedgerByEntity' : ActorMethod<[EntityId], Array<LedgerEntry>>,
+  'getMyAgency' : ActorMethod<[], [] | [Agency]>,
+  'getMyAgents' : ActorMethod<[], Result_4>,
+  'getNotifications' : ActorMethod<[EntityId], Array<InAppNotification>>,
   'getOutstandingReport' : ActorMethod<[], Array<OutstandingEntry>>,
+  'getPlatformStats' : ActorMethod<[], Result_3>,
   'getProfitLossReport' : ActorMethod<[], ProfitLossReport>,
   'getRunningBalance' : ActorMethod<[EntityId], number>,
   'getSettings' : ActorMethod<[], Settings>,
   'getSuppliers' : ActorMethod<[], Array<Client>>,
   'getTrialBalance' : ActorMethod<[], Array<TrialBalanceEntry>>,
+  'getUnreadNotificationCount' : ActorMethod<[EntityId], bigint>,
+  'getVoucherById' : ActorMethod<[EntityId], [] | [Voucher]>,
   'getVouchers' : ActorMethod<[], Array<Voucher>>,
   'getVouchersByType' : ActorMethod<[VoucherType], Array<Voucher>>,
+  'getVouchersSummary' : ActorMethod<[], VouchersSummary>,
+  'getWeeklyLedgerSummary' : ActorMethod<
+    [Timestamp, Timestamp],
+    Array<WeeklyLedgerSummary>
+  >,
   'isCallerAdmin' : ActorMethod<[], boolean>,
+  'isSuperAdmin' : ActorMethod<[], boolean>,
+  'linkMyAgentPrincipal' : ActorMethod<[EntityId, Principal], Result>,
+  'markAllNotificationsRead' : ActorMethod<[EntityId], bigint>,
+  'markNotificationRead' : ActorMethod<[EntityId], boolean>,
+  'recordInvoicePayment' : ActorMethod<[EntityId, number], Result>,
+  'removeAgent' : ActorMethod<[EntityId], Result>,
+  'setSuperAdminPrincipal' : ActorMethod<[], Result>,
+  'toggleAgentAccess' : ActorMethod<[EntityId, boolean], Result>,
+  'updateAdvanceVoucher' : ActorMethod<
+    [
+      EntityId,
+      Timestamp,
+      [] | [EntityId],
+      [] | [EntityId],
+      [] | [EntityId],
+      [] | [EntityId],
+      [] | [AdvanceType],
+      number,
+      [] | [PaymentMethod],
+      [] | [string],
+      Array<VoucherEntry>,
+    ],
+    Result_2
+  >,
+  'updateAgencyProfile' : ActorMethod<[[] | [string], [] | [string]], Result_1>,
+  'updateAgencyStatus' : ActorMethod<[EntityId, boolean], Result>,
   'updateBooking' : ActorMethod<
     [
       EntityId,
@@ -211,6 +480,34 @@ export interface _SERVICE {
   >,
   'updateClient' : ActorMethod<
     [EntityId, string, string, [] | [string], number],
+    Result
+  >,
+  'updateContraVoucher' : ActorMethod<
+    [EntityId, Timestamp, string, string, number, [] | [string]],
+    Result
+  >,
+  'updateHotelVoucher' : ActorMethod<
+    [
+      EntityId,
+      EntityId,
+      [] | [EntityId],
+      Timestamp,
+      Array<HotelVoucherLine>,
+      [] | [string],
+    ],
+    [] | [HotelVoucher]
+  >,
+  'updateInvoice' : ActorMethod<[EntityId, number, [] | [string]], Result>,
+  'updateJournalVoucher' : ActorMethod<
+    [EntityId, Timestamp, Array<VoucherEntry>, [] | [string]],
+    Result
+  >,
+  'updatePaymentVoucher' : ActorMethod<
+    [EntityId, Timestamp, EntityId, number, PaymentMethod, [] | [string]],
+    Result
+  >,
+  'updateReceiptVoucher' : ActorMethod<
+    [EntityId, Timestamp, EntityId, number, PaymentMethod, [] | [string]],
     Result
   >,
   'updateSettings' : ActorMethod<

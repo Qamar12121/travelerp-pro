@@ -89,10 +89,32 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "notification-slide-in": {
+          from: {
+            opacity: "0",
+            transform: "translateX(384px)",
+          },
+          to: {
+            opacity: "1",
+            transform: "translateX(0)",
+          },
+        },
+        "notification-slide-out": {
+          from: {
+            opacity: "1",
+            transform: "translateX(0)",
+          },
+          to: {
+            opacity: "0",
+            transform: "translateX(384px)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "notification-slide-in": "notification-slide-in 0.3s ease-out",
+        "notification-slide-out": "notification-slide-out 0.2s ease-in",
       },
     },
   },

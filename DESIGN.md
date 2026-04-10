@@ -10,10 +10,12 @@
 | Background | 0.08 0 0 | #0A0A0A | Primary deep black |
 | Card | 0.11 0 0 | #1A1A1A | Surface elevation for cards, sidebar |
 | Foreground | 0.95 0 0 | #F2F2F2 | Text on dark backgrounds |
-| Accent | 0.65 0.17 81 | #D4AF37 | Gold highlights, active states, KPI borders |
-| Destructive | 0.65 0.19 22 | #F23645 | Error, delete actions |
-| Chart-1 | 0.65 0.17 81 | #D4AF37 | Gold data visualization |
-| Muted-foreground | 0.55 0 0 | #8C8C8C | Secondary text, disabled states |
+| Accent | 0.75 0.15 82 | #D4AF37 | Gold highlights, active states, KPI borders |
+| Destructive | 0.62 0.22 22 | #DC143C | Error, delete, refund invoices |
+| Refund Status | 0.70 0.20 70 | #E8A83B | Orange badge for refunded invoices |
+| Admin Accent | 0.62 0.24 22 | #DC143C | Admin panel crimson actions (distinct from gold) |
+| Chart-1 | 0.75 0.15 82 | #D4AF37 | Gold data visualization |
+| Muted-foreground | 0.52 0 0 | #858585 | Secondary text, disabled states |
 
 ## Typography
 
@@ -66,3 +68,14 @@
 ## Signature Detail
 
 Glassmorphism cards with subtle gold gradient borders activate on hover — distinct from typical corporate dashboards. Gold used sparingly as accent, not wallpaper.
+
+## Extended Features (New)
+
+| Feature | Pattern | Accent | Details |
+|---------|---------|--------|---------|
+| Registration Flow | Hero + glass forms | Gold primary CTA | Email/password inputs with `.form-field` styling, gold focus rings |
+| Refund Invoices | Warm orange badge `.badge-refund` | oklch(0.70 0.20 70) | Distinct from red destructive, warm tone for refund status |
+| Hotel Vouchers | Multi-item table rows with `.hotel-item` | Gold icons | Compact table display, hotel icon + name per row, gold accents |
+| Notification Center | Toast notifications with slide animations | Status-based | Success (green), warning (amber), error (red), info (blue) |
+| Admin Panel | Crimson accent `.admin-accent` | oklch(0.62 0.24 22) | Separate visual hierarchy from gold agency theme; red button actions |
+| Profile Management | Modal forms with `.form-field` | Gold accents | Agency owner profile, logo upload, password change, agent management |

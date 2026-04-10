@@ -87,6 +87,12 @@
     --sidebar-accent-foreground: 0.085 0 0;
     --sidebar-border: 0.2 0 0;
     --sidebar-ring: 0.75 0.15 82;
+
+    /* New tokens for extended features */
+    --status-refund: 0.7 0.2 70;
+    --status-refund-foreground: 0.085 0 0;
+    --admin-accent: 0.62 0.24 22;
+    --admin-accent-foreground: 0.93 0 0;
   }
 
   * {
@@ -207,5 +213,62 @@
 
   .badge-cancelled {
     @apply badge-overdue;
+  }
+
+  .badge-refund {
+    @apply text-xs font-medium px-2 py-0.5 rounded-full;
+    color: oklch(0.7 0.2 70);
+    background: oklch(0.7 0.2 70 / 0.15);
+  }
+
+  .badge-registered {
+    @apply text-xs font-medium px-2 py-0.5 rounded-full;
+    color: oklch(0.7 0.15 170);
+    background: oklch(0.7 0.15 170 / 0.15);
+  }
+
+  .hotel-item {
+    @apply flex items-center gap-2 px-3 py-1.5 rounded-lg;
+    background: oklch(0.2 0 0 / 0.4);
+    border: 1px solid oklch(0.75 0.15 82 / 0.15);
+  }
+
+  .notification-enter {
+    animation: notification-slide-in 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .notification-exit {
+    animation: notification-slide-out 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .admin-accent {
+    color: oklch(var(--admin-accent));
+  }
+
+  .admin-accent-bg {
+    background: oklch(var(--admin-accent) / 0.1);
+    border-color: oklch(var(--admin-accent) / 0.3);
+  }
+
+  .admin-accent-bg:hover {
+    background: oklch(var(--admin-accent) / 0.15);
+    border-color: oklch(var(--admin-accent) / 0.5);
+  }
+
+  .form-field {
+    @apply w-full px-4 py-2.5 rounded-lg border transition-smooth;
+    background: oklch(0.2 0 0);
+    border-color: oklch(0.2 0 0);
+    color: oklch(0.93 0 0);
+  }
+
+  .form-field::placeholder {
+    color: oklch(0.52 0 0);
+  }
+
+  .form-field:focus {
+    outline: none;
+    border-color: oklch(0.75 0.15 82);
+    box-shadow: 0 0 0 2px oklch(0.75 0.15 82 / 0.2);
   }
 }

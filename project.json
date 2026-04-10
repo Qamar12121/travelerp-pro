@@ -1,28 +1,25 @@
 {
-  "overview": "Enterprise-level Travel Accounting ERP SaaS Platform for travel agencies. Manage flight bookings, visa/umrah packages, full double-entry accounting, vouchers, ledger, commission tracking, and financial reports — all with a stunning luxury black & gold UI.",
+  "overview": "TravelERP Pro is a luxury SaaS Travel Accounting ERP for travel agencies featuring agency onboarding, refund invoices, multi-supplier vouchers, PDF exports, email notifications, and a comprehensive admin panel — all wrapped in a black-and-gold glassmorphism UI.",
   "features": [
-    "Dashboard with KPI cards (Sales, Profit, Receivable, Payable)",
-    "Bookings management with auto invoice & journal voucher creation",
-    "Invoices with print and PDF download",
-    "Vouchers: Receipt, Payment, Journal, Contra (full double-entry)",
-    "Ledger with running balance per client/supplier",
-    "Clients & Suppliers CRUD management",
-    "Reports: Profit & Loss, Trial Balance, Outstanding balances",
-    "Settings: currency, invoice & voucher numbering",
-    "Role-based auth: Admin, Accountant, Agent",
-    "Luxury black & gold glassmorphism UI with smooth animations"
+    "Agency onboarding flow for first-time setup",
+    "Refund invoices with automatic credit note and ledger reversal",
+    "Multi-supplier hotel vouchers with split amounts",
+    "PDF export for invoices and vouchers",
+    "Email notifications for payments and refunds",
+    "In-app notification bell with unread count",
+    "Enhanced super-admin panel with live stats and activity log",
+    "Full profile management for all user roles"
   ],
-  "category": "finance-accounting",
+  "category": "productivity",
   "tags": [
     "travel",
     "erp",
     "accounting",
-    "invoicing",
+    "invoices",
     "vouchers",
-    "ledger",
     "saas",
-    "double-entry",
-    "finance"
+    "multi-user",
+    "luxury-ui"
   ],
-  "last_updated": "2026-04-10T10:43:52.849Z"
+  "last_updated": "2026-04-10T12:58:11.458Z"
 }

@@ -74,8 +74,75 @@ mixin (
     VLLib.getVouchers(vouchers);
   };
 
+  public query func getVoucherById(id : Common.EntityId) : async ?TypesVL.Voucher {
+    VLLib.getVoucherById(vouchers, id);
+  };
+
   public query func getVouchersByType(voucherType : Common.VoucherType) : async [TypesVL.Voucher] {
     VLLib.getVouchersByType(vouchers, voucherType);
+  };
+
+  public shared ({ caller }) func updateReceiptVoucher(
+    id : Common.EntityId,
+    date : Common.Timestamp,
+    clientId : Common.EntityId,
+    amount : Float,
+    paymentMethod : Common.PaymentMethod,
+    remarks : ?Text,
+  ) : async Common.Result<(), Text> {
+    if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
+      Runtime.trap("Unauthorized");
+    };
+    VLLib.updateReceiptVoucher(vouchers, id, date, clientId, amount, paymentMethod, remarks, caller);
+  };
+
+  public shared ({ caller }) func updatePaymentVoucher(
+    id : Common.EntityId,
+    date : Common.Timestamp,
+    supplierId : Common.EntityId,
+    amount : Float,
+    paymentMethod : Common.PaymentMethod,
+    remarks : ?Text,
+  ) : async Common.Result<(), Text> {
+    if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
+      Runtime.trap("Unauthorized");
+    };
+    VLLib.updatePaymentVoucher(vouchers, id, date, supplierId, amount, paymentMethod, remarks, caller);
+  };
+
+  public shared ({ caller }) func updateJournalVoucher(
+    id : Common.EntityId,
+    date : Common.Timestamp,
+    entries : [TypesVL.VoucherEntry],
+    remarks : ?Text,
+  ) : async Common.Result<(), Text> {
+    if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
+      Runtime.trap("Unauthorized");
+    };
+    VLLib.updateJournalVoucher(vouchers, id, date, entries, remarks, caller);
+  };
+
+  public shared ({ caller }) func updateContraVoucher(
+    id : Common.EntityId,
+    date : Common.Timestamp,
+    fromAccount : Text,
+    toAccount : Text,
+    amount : Float,
+    remarks : ?Text,
+  ) : async Common.Result<(), Text> {
+    if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
+      Runtime.trap("Unauthorized");
+    };
+    VLLib.updateContraVoucher(vouchers, id, date, fromAccount, toAccount, amount, remarks, caller);
+  };
+
+  public shared ({ caller }) func deleteVoucher(
+    id : Common.EntityId,
+  ) : async Common.Result<(), Text> {
+    if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
+      Runtime.trap("Unauthorized");
+    };
+    VLLib.deleteVoucher(vouchers, id, caller);
   };
 
   public query func getLedgerByEntity(entityId : Common.EntityId) : async [TypesVL.LedgerEntry] {

@@ -332,6 +332,145 @@ module {
     vouchers.values().toArray();
   };
 
+  public func getVoucherById(vouchers : VoucherMap, id : Common.EntityId) : ?TypesVL.Voucher {
+    vouchers.get(id);
+  };
+
+  public func updateReceiptVoucher(
+    vouchers : VoucherMap,
+    id : Common.EntityId,
+    date : Common.Timestamp,
+    clientId : Common.EntityId,
+    amount : Float,
+    paymentMethod : Common.PaymentMethod,
+    remarks : ?Text,
+    _caller : Principal,
+  ) : Common.Result<(), Text> {
+    switch (vouchers.get(id)) {
+      case null { #err("Voucher not found: " # id) };
+      case (?existing) {
+        if (existing.voucherType != #receipt) {
+          return #err("Voucher is not a receipt voucher");
+        };
+        let cashAccountName = switch (paymentMethod) {
+          case (#cash) "Cash";
+          case (#bank) "Bank";
+        };
+        let entries : [TypesVL.VoucherEntry] = [
+          { accountId = "CASH"; accountName = cashAccountName; debit = amount; credit = 0.0 },
+          { accountId = clientId; accountName = "Client"; debit = 0.0; credit = amount },
+        ];
+        vouchers.add(id, { existing with date; clientId = ?clientId; amount; paymentMethod = ?paymentMethod; remarks; entries });
+        #ok(());
+      };
+    };
+  };
+
+  public func updatePaymentVoucher(
+    vouchers : VoucherMap,
+    id : Common.EntityId,
+    date : Common.Timestamp,
+    supplierId : Common.EntityId,
+    amount : Float,
+    paymentMethod : Common.PaymentMethod,
+    remarks : ?Text,
+    _caller : Principal,
+  ) : Common.Result<(), Text> {
+    switch (vouchers.get(id)) {
+      case null { #err("Voucher not found: " # id) };
+      case (?existing) {
+        if (existing.voucherType != #payment) {
+          return #err("Voucher is not a payment voucher");
+        };
+        let cashAccountName = switch (paymentMethod) {
+          case (#cash) "Cash";
+          case (#bank) "Bank";
+        };
+        let entries : [TypesVL.VoucherEntry] = [
+          { accountId = supplierId; accountName = "Supplier"; debit = amount; credit = 0.0 },
+          { accountId = "CASH"; accountName = cashAccountName; debit = 0.0; credit = amount },
+        ];
+        vouchers.add(id, { existing with date; supplierId = ?supplierId; amount; paymentMethod = ?paymentMethod; remarks; entries });
+        #ok(());
+      };
+    };
+  };
+
+  public func updateJournalVoucher(
+    vouchers : VoucherMap,
+    id : Common.EntityId,
+    date : Common.Timestamp,
+    entries : [TypesVL.VoucherEntry],
+    remarks : ?Text,
+    _caller : Principal,
+  ) : Common.Result<(), Text> {
+    switch (vouchers.get(id)) {
+      case null { #err("Voucher not found: " # id) };
+      case (?existing) {
+        if (existing.voucherType != #journal) {
+          return #err("Voucher is not a journal voucher");
+        };
+        // Validate balance
+        var totalDebit : Float = 0.0;
+        var totalCredit : Float = 0.0;
+        for (e in entries.values()) {
+          totalDebit += e.debit;
+          totalCredit += e.credit;
+        };
+        let diff = totalDebit - totalCredit;
+        let absDiff = if (diff < 0.0) { -diff } else { diff };
+        if (absDiff > 0.001) {
+          return #err("Journal entries do not balance: debits=" # debug_show(totalDebit) # " credits=" # debug_show(totalCredit));
+        };
+        vouchers.add(id, { existing with date; entries; remarks; amount = totalDebit });
+        #ok(());
+      };
+    };
+  };
+
+  public func updateContraVoucher(
+    vouchers : VoucherMap,
+    id : Common.EntityId,
+    date : Common.Timestamp,
+    fromAccount : Text,
+    toAccount : Text,
+    amount : Float,
+    remarks : ?Text,
+    _caller : Principal,
+  ) : Common.Result<(), Text> {
+    switch (vouchers.get(id)) {
+      case null { #err("Voucher not found: " # id) };
+      case (?existing) {
+        if (existing.voucherType != #contra) {
+          return #err("Voucher is not a contra voucher");
+        };
+        if (amount <= 0.0) {
+          return #err("Amount must be greater than zero");
+        };
+        let entries : [TypesVL.VoucherEntry] = [
+          { accountId = toAccount; accountName = toAccount; debit = amount; credit = 0.0 },
+          { accountId = fromAccount; accountName = fromAccount; debit = 0.0; credit = amount },
+        ];
+        vouchers.add(id, { existing with date; amount; remarks; entries });
+        #ok(());
+      };
+    };
+  };
+
+  public func deleteVoucher(
+    vouchers : VoucherMap,
+    id : Common.EntityId,
+    _caller : Principal,
+  ) : Common.Result<(), Text> {
+    switch (vouchers.get(id)) {
+      case null { #err("Voucher not found: " # id) };
+      case (_) {
+        vouchers.remove(id);
+        #ok(());
+      };
+    };
+  };
+
   public func getVouchersByType(vouchers : VoucherMap, voucherType : Common.VoucherType) : [TypesVL.Voucher] {
     vouchers.values().filter(func(v) { v.voucherType == voucherType }).toArray();
   };
@@ -364,7 +503,7 @@ module {
   };
 
   public func getTrialBalance(
-    vouchers : VoucherMap,
+    _vouchers : VoucherMap,
     ledger : LedgerList,
   ) : [TypesVL.TrialBalanceEntry] {
     // Aggregate debits and credits per accountId from all ledger entries

@@ -8,18 +8,15 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
-export const EntityId = IDL.Text;
-export const BookingType = IDL.Variant({
-  'ticket' : IDL.Null,
-  'tour' : IDL.Null,
-  'visa' : IDL.Null,
-  'umrah' : IDL.Null,
-});
 export const Timestamp = IDL.Int;
-export const Result_1 = IDL.Variant({ 'ok' : IDL.Text, 'err' : IDL.Text });
-export const ClientType = IDL.Variant({
-  'client' : IDL.Null,
-  'supplier' : IDL.Null,
+export const EntityId = IDL.Text;
+export const AdvanceType = IDL.Variant({
+  'paid' : IDL.Null,
+  'received' : IDL.Null,
+});
+export const PaymentMethod = IDL.Variant({
+  'bank' : IDL.Null,
+  'cash' : IDL.Null,
 });
 export const VoucherEntry = IDL.Record({
   'accountId' : EntityId,
@@ -27,16 +24,159 @@ export const VoucherEntry = IDL.Record({
   'accountName' : IDL.Text,
   'debit' : IDL.Float64,
 });
-export const PaymentMethod = IDL.Variant({
-  'bank' : IDL.Null,
-  'cash' : IDL.Null,
+export const AdvanceVoucher = IDL.Record({
+  'id' : EntityId,
+  'linkedClientId' : IDL.Opt(EntityId),
+  'clientId' : IDL.Opt(EntityId),
+  'linkedSupplierId' : IDL.Opt(EntityId),
+  'paymentMethod' : IDL.Opt(PaymentMethod),
+  'date' : Timestamp,
+  'createdAt' : Timestamp,
+  'createdBy' : IDL.Principal,
+  'entries' : IDL.Vec(VoucherEntry),
+  'advanceType' : IDL.Opt(AdvanceType),
+  'voucherNo' : IDL.Text,
+  'amount' : IDL.Float64,
+  'supplierId' : IDL.Opt(EntityId),
+  'remarks' : IDL.Opt(IDL.Text),
+});
+export const Result_2 = IDL.Variant({
+  'ok' : AdvanceVoucher,
+  'err' : IDL.Text,
+});
+export const AgentRole = IDL.Variant({
+  'agent' : IDL.Null,
+  'owner' : IDL.Null,
+});
+export const AgentProfile = IDL.Record({
+  'id' : EntityId,
+  'principal' : IDL.Opt(IDL.Principal),
+  'name' : IDL.Text,
+  'createdAt' : Timestamp,
+  'createdBy' : IDL.Principal,
+  'role' : AgentRole,
+  'agencyId' : EntityId,
+  'isActive' : IDL.Bool,
+  'email' : IDL.Text,
+});
+export const Result_10 = IDL.Variant({ 'ok' : AgentProfile, 'err' : IDL.Text });
+export const BookingType = IDL.Variant({
+  'ticket' : IDL.Null,
+  'tour' : IDL.Null,
+  'visa' : IDL.Null,
+  'umrah' : IDL.Null,
+});
+export const Result_9 = IDL.Variant({ 'ok' : IDL.Text, 'err' : IDL.Text });
+export const ClientType = IDL.Variant({
+  'client' : IDL.Null,
+  'supplier' : IDL.Null,
+});
+export const HotelVoucherLine = IDL.Record({
+  'checkIn' : Timestamp,
+  'hotelName' : IDL.Text,
+  'confirmationNo' : IDL.Text,
+  'city' : IDL.Text,
+  'guestName' : IDL.Text,
+  'ratePerNight' : IDL.Float64,
+  'totalAmount' : IDL.Float64,
+  'checkOut' : Timestamp,
+  'nights' : IDL.Nat,
+  'roomType' : IDL.Text,
+  'supplierId' : EntityId,
+});
+export const HotelVoucher = IDL.Record({
+  'id' : EntityId,
+  'clientId' : EntityId,
+  'date' : Timestamp,
+  'createdAt' : Timestamp,
+  'createdBy' : IDL.Text,
+  'agentId' : IDL.Opt(EntityId),
+  'agencyId' : EntityId,
+  'totalAmount' : IDL.Float64,
+  'voucherNo' : IDL.Text,
+  'hotels' : IDL.Vec(HotelVoucherLine),
+  'remarks' : IDL.Opt(IDL.Text),
 });
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
+export const Agency = IDL.Record({
+  'id' : EntityId,
+  'timezone' : IDL.Opt(IDL.Text),
+  'country' : IDL.Opt(IDL.Text),
+  'totalAgents' : IDL.Nat,
+  'ownerPrincipal' : IDL.Principal,
+  'createdAt' : Timestamp,
+  'isOnboarded' : IDL.Bool,
+  'isActive' : IDL.Bool,
+  'logoUrl' : IDL.Opt(IDL.Text),
+  'agencyName' : IDL.Text,
+  'phone' : IDL.Opt(IDL.Text),
+});
+export const Result_1 = IDL.Variant({ 'ok' : Agency, 'err' : IDL.Text });
+export const RefundRequest = IDL.Record({
+  'refundAmount' : IDL.Float64,
+  'invoiceId' : EntityId,
+  'refundDate' : Timestamp,
+  'reason' : IDL.Text,
+});
+export const InvoiceStatus = IDL.Variant({
+  'paid' : IDL.Null,
+  'unpaid' : IDL.Null,
+  'partial' : IDL.Null,
+});
+export const InvoiceType = IDL.Variant({
+  'creditNote' : IDL.Null,
+  'booking' : IDL.Null,
+  'manual' : IDL.Null,
+  'debitNote' : IDL.Null,
+  'proforma' : IDL.Null,
+});
+export const Invoice = IDL.Record({
+  'id' : EntityId,
+  'due' : IDL.Float64,
+  'status' : InvoiceStatus,
+  'clientId' : EntityId,
+  'bookingId' : EntityId,
+  'discountAmount' : IDL.Float64,
+  'createdAt' : Timestamp,
+  'paid' : IDL.Float64,
+  'invoiceNo' : IDL.Text,
+  'invoiceType' : InvoiceType,
+  'notes' : IDL.Opt(IDL.Text),
+  'taxAmount' : IDL.Float64,
+  'amount' : IDL.Float64,
+  'refundedInvoiceId' : IDL.Opt(IDL.Text),
+  'remarks' : IDL.Opt(IDL.Text),
+});
+export const Result_8 = IDL.Variant({ 'ok' : Invoice, 'err' : IDL.Text });
 export const Result = IDL.Variant({ 'ok' : IDL.Null, 'err' : IDL.Text });
+export const ActivityLogEntry = IDL.Record({
+  'id' : EntityId,
+  'description' : IDL.Text,
+  'agencyId' : EntityId,
+  'actorId' : IDL.Opt(IDL.Text),
+  'timestamp' : Timestamp,
+  'eventType' : IDL.Text,
+});
+export const Result_7 = IDL.Variant({
+  'ok' : IDL.Vec(ActivityLogEntry),
+  'err' : IDL.Text,
+});
+export const AgencyStats = IDL.Record({
+  'totalBookings' : IDL.Nat,
+  'totalProfit' : IDL.Float64,
+  'activeAgents' : IDL.Nat,
+  'totalRevenue' : IDL.Float64,
+  'lastActivityAt' : IDL.Opt(Timestamp),
+});
+export const Result_6 = IDL.Variant({ 'ok' : AgencyStats, 'err' : IDL.Text });
+export const Result_5 = IDL.Variant({
+  'ok' : IDL.Vec(Agency),
+  'err' : IDL.Text,
+});
 export const BookingStatus = IDL.Variant({
   'cancelled' : IDL.Null,
   'pending' : IDL.Null,
@@ -67,6 +207,20 @@ export const Client = IDL.Record({
   'openingBalance' : IDL.Float64,
   'phone' : IDL.Text,
 });
+export const ClientLedgerSummary = IDL.Record({
+  'totalCredit' : IDL.Float64,
+  'closingBalance' : IDL.Float64,
+  'entityId' : EntityId,
+  'openingBalance' : IDL.Float64,
+  'entityName' : IDL.Text,
+  'totalDebit' : IDL.Float64,
+});
+export const DailyLedgerSummary = IDL.Record({
+  'totalCredit' : IDL.Float64,
+  'date' : IDL.Text,
+  'netBalance' : IDL.Float64,
+  'totalDebit' : IDL.Float64,
+});
 export const DashboardStats = IDL.Record({
   'todayTransactions' : IDL.Nat,
   'totalReceivable' : IDL.Float64,
@@ -74,21 +228,11 @@ export const DashboardStats = IDL.Record({
   'totalSales' : IDL.Float64,
   'totalPayable' : IDL.Float64,
 });
-export const InvoiceStatus = IDL.Variant({
-  'paid' : IDL.Null,
-  'unpaid' : IDL.Null,
-  'partial' : IDL.Null,
-});
-export const Invoice = IDL.Record({
-  'id' : EntityId,
-  'due' : IDL.Float64,
-  'status' : InvoiceStatus,
-  'clientId' : EntityId,
-  'bookingId' : EntityId,
-  'createdAt' : Timestamp,
-  'paid' : IDL.Float64,
-  'invoiceNo' : IDL.Text,
-  'amount' : IDL.Float64,
+export const InvoicesSummary = IDL.Record({
+  'totalPaid' : IDL.Float64,
+  'totalDue' : IDL.Float64,
+  'totalAmount' : IDL.Float64,
+  'totalInvoices' : IDL.Nat,
 });
 export const LedgerEntry = IDL.Record({
   'id' : EntityId,
@@ -102,6 +246,27 @@ export const LedgerEntry = IDL.Record({
   'voucherNo' : IDL.Text,
   'debit' : IDL.Float64,
 });
+export const Result_4 = IDL.Variant({
+  'ok' : IDL.Vec(AgentProfile),
+  'err' : IDL.Text,
+});
+export const NotificationType = IDL.Variant({
+  'refundCreated' : IDL.Null,
+  'systemAlert' : IDL.Null,
+  'invoiceOverdue' : IDL.Null,
+  'bookingConfirmed' : IDL.Null,
+  'paymentReceived' : IDL.Null,
+});
+export const InAppNotification = IDL.Record({
+  'id' : EntityId,
+  'title' : IDL.Text,
+  'notificationType' : NotificationType,
+  'createdAt' : Timestamp,
+  'agencyId' : EntityId,
+  'isRead' : IDL.Bool,
+  'message' : IDL.Text,
+  'relatedId' : IDL.Opt(IDL.Text),
+});
 export const OutstandingEntry = IDL.Record({
   'due' : IDL.Float64,
   'clientName' : IDL.Text,
@@ -109,6 +274,14 @@ export const OutstandingEntry = IDL.Record({
   'invoiceNo' : IDL.Text,
   'amount' : IDL.Float64,
 });
+export const PlatformStats = IDL.Record({
+  'refundRate' : IDL.Float64,
+  'activeAgencies' : IDL.Nat,
+  'totalAgencies' : IDL.Nat,
+  'totalRefunds' : IDL.Float64,
+  'totalRevenue' : IDL.Float64,
+});
+export const Result_3 = IDL.Variant({ 'ok' : PlatformStats, 'err' : IDL.Text });
 export const ProfitLossReport = IDL.Record({
   'grossProfit' : IDL.Float64,
   'totalCost' : IDL.Float64,
@@ -116,6 +289,7 @@ export const ProfitLossReport = IDL.Record({
   'netProfit' : IDL.Float64,
 });
 export const Settings = IDL.Record({
+  'hotelVoucherNextNo' : IDL.Nat,
   'invoiceNextNo' : IDL.Nat,
   'voucherNextNo' : IDL.Nat,
   'invoicePrefix' : IDL.Text,
@@ -148,9 +322,40 @@ export const Voucher = IDL.Record({
   'supplierId' : IDL.Opt(EntityId),
   'remarks' : IDL.Opt(IDL.Text),
 });
+export const VouchersSummary = IDL.Record({
+  'totalReceipts' : IDL.Float64,
+  'totalPayments' : IDL.Float64,
+  'totalAdvances' : IDL.Float64,
+  'totalVouchers' : IDL.Nat,
+});
+export const WeeklyLedgerSummary = IDL.Record({
+  'endDate' : IDL.Text,
+  'totalCredit' : IDL.Float64,
+  'netBalance' : IDL.Float64,
+  'weekLabel' : IDL.Text,
+  'totalDebit' : IDL.Float64,
+  'startDate' : IDL.Text,
+});
 
 export const idlService = IDL.Service({
   '_initializeAccessControl' : IDL.Func([], [], []),
+  'addAdvanceVoucher' : IDL.Func(
+      [
+        Timestamp,
+        IDL.Opt(EntityId),
+        IDL.Opt(EntityId),
+        IDL.Opt(EntityId),
+        IDL.Opt(EntityId),
+        IDL.Opt(AdvanceType),
+        IDL.Float64,
+        IDL.Opt(PaymentMethod),
+        IDL.Opt(IDL.Text),
+        IDL.Vec(VoucherEntry),
+      ],
+      [Result_2],
+      [],
+    ),
+  'addAgent' : IDL.Func([IDL.Text, IDL.Text], [Result_10], []),
   'addBooking' : IDL.Func(
       [
         EntityId,
@@ -162,55 +367,160 @@ export const idlService = IDL.Service({
         IDL.Float64,
         IDL.Float64,
       ],
-      [Result_1],
+      [Result_9],
       [],
     ),
   'addClient' : IDL.Func(
       [IDL.Text, IDL.Text, IDL.Opt(IDL.Text), IDL.Float64, ClientType],
-      [Result_1],
+      [Result_9],
       [],
     ),
   'addContraVoucher' : IDL.Func(
       [Timestamp, IDL.Text, IDL.Text, IDL.Float64, IDL.Opt(IDL.Text)],
-      [Result_1],
+      [Result_9],
+      [],
+    ),
+  'addHotelVoucher' : IDL.Func(
+      [
+        EntityId,
+        EntityId,
+        IDL.Opt(EntityId),
+        Timestamp,
+        IDL.Vec(HotelVoucherLine),
+        IDL.Opt(IDL.Text),
+      ],
+      [HotelVoucher],
       [],
     ),
   'addJournalVoucher' : IDL.Func(
       [Timestamp, IDL.Vec(VoucherEntry), IDL.Opt(IDL.Text)],
-      [Result_1],
+      [Result_9],
       [],
     ),
   'addPaymentVoucher' : IDL.Func(
       [Timestamp, EntityId, IDL.Float64, PaymentMethod, IDL.Opt(IDL.Text)],
-      [Result_1],
+      [Result_9],
       [],
     ),
   'addReceiptVoucher' : IDL.Func(
       [Timestamp, EntityId, IDL.Float64, PaymentMethod, IDL.Opt(IDL.Text)],
-      [Result_1],
+      [Result_9],
       [],
     ),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'completeOnboarding' : IDL.Func(
+      [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text), IDL.Opt(IDL.Text)],
+      [Result_1],
+      [],
+    ),
+  'createAgency' : IDL.Func([IDL.Text], [Result_1], []),
+  'createRefundInvoice' : IDL.Func([EntityId, RefundRequest], [Result_8], []),
+  'deleteAdvanceVoucher' : IDL.Func([EntityId], [Result], []),
+  'deleteBooking' : IDL.Func([EntityId], [Result], []),
   'deleteClient' : IDL.Func([EntityId], [Result], []),
+  'deleteHotelVoucher' : IDL.Func([EntityId], [IDL.Bool], []),
+  'deleteInvoice' : IDL.Func([EntityId], [Result], []),
+  'deleteNotification' : IDL.Func([EntityId], [IDL.Bool], []),
+  'deleteVoucher' : IDL.Func([EntityId], [Result], []),
+  'getAdvanceVoucherById' : IDL.Func(
+      [EntityId],
+      [IDL.Opt(AdvanceVoucher)],
+      ['query'],
+    ),
+  'getAdvanceVouchers' : IDL.Func([], [IDL.Vec(AdvanceVoucher)], ['query']),
+  'getAgencyActivityLog' : IDL.Func([EntityId], [Result_7], ['query']),
+  'getAgencyStats' : IDL.Func([EntityId], [Result_6], ['query']),
+  'getAgentProfile' : IDL.Func([], [IDL.Opt(AgentProfile)], ['query']),
+  'getAllAgencies' : IDL.Func([], [Result_5], ['query']),
   'getBookingById' : IDL.Func([EntityId], [IDL.Opt(Booking)], ['query']),
   'getBookings' : IDL.Func([], [IDL.Vec(Booking)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getClientById' : IDL.Func([EntityId], [IDL.Opt(Client)], ['query']),
+  'getClientLedgerSummaries' : IDL.Func(
+      [],
+      [IDL.Vec(ClientLedgerSummary)],
+      ['query'],
+    ),
   'getClients' : IDL.Func([], [IDL.Vec(Client)], ['query']),
+  'getDailyLedgerSummary' : IDL.Func(
+      [Timestamp, Timestamp],
+      [IDL.Vec(DailyLedgerSummary)],
+      ['query'],
+    ),
   'getDashboardStats' : IDL.Func([], [DashboardStats], ['query']),
+  'getHotelVoucherById' : IDL.Func(
+      [EntityId],
+      [IDL.Opt(HotelVoucher)],
+      ['query'],
+    ),
+  'getHotelVouchers' : IDL.Func([EntityId], [IDL.Vec(HotelVoucher)], ['query']),
   'getInvoiceById' : IDL.Func([EntityId], [IDL.Opt(Invoice)], ['query']),
   'getInvoices' : IDL.Func([], [IDL.Vec(Invoice)], ['query']),
   'getInvoicesByClient' : IDL.Func([EntityId], [IDL.Vec(Invoice)], ['query']),
+  'getInvoicesByStatus' : IDL.Func(
+      [InvoiceStatus],
+      [IDL.Vec(Invoice)],
+      ['query'],
+    ),
+  'getInvoicesByType' : IDL.Func([InvoiceType], [IDL.Vec(Invoice)], ['query']),
+  'getInvoicesSummary' : IDL.Func([], [InvoicesSummary], ['query']),
   'getLedgerByEntity' : IDL.Func([EntityId], [IDL.Vec(LedgerEntry)], ['query']),
+  'getMyAgency' : IDL.Func([], [IDL.Opt(Agency)], ['query']),
+  'getMyAgents' : IDL.Func([], [Result_4], ['query']),
+  'getNotifications' : IDL.Func(
+      [EntityId],
+      [IDL.Vec(InAppNotification)],
+      ['query'],
+    ),
   'getOutstandingReport' : IDL.Func([], [IDL.Vec(OutstandingEntry)], ['query']),
+  'getPlatformStats' : IDL.Func([], [Result_3], ['query']),
   'getProfitLossReport' : IDL.Func([], [ProfitLossReport], ['query']),
   'getRunningBalance' : IDL.Func([EntityId], [IDL.Float64], ['query']),
   'getSettings' : IDL.Func([], [Settings], ['query']),
   'getSuppliers' : IDL.Func([], [IDL.Vec(Client)], ['query']),
   'getTrialBalance' : IDL.Func([], [IDL.Vec(TrialBalanceEntry)], ['query']),
+  'getUnreadNotificationCount' : IDL.Func([EntityId], [IDL.Nat], ['query']),
+  'getVoucherById' : IDL.Func([EntityId], [IDL.Opt(Voucher)], ['query']),
   'getVouchers' : IDL.Func([], [IDL.Vec(Voucher)], ['query']),
   'getVouchersByType' : IDL.Func([VoucherType], [IDL.Vec(Voucher)], ['query']),
+  'getVouchersSummary' : IDL.Func([], [VouchersSummary], ['query']),
+  'getWeeklyLedgerSummary' : IDL.Func(
+      [Timestamp, Timestamp],
+      [IDL.Vec(WeeklyLedgerSummary)],
+      ['query'],
+    ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'isSuperAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'linkMyAgentPrincipal' : IDL.Func([EntityId, IDL.Principal], [Result], []),
+  'markAllNotificationsRead' : IDL.Func([EntityId], [IDL.Nat], []),
+  'markNotificationRead' : IDL.Func([EntityId], [IDL.Bool], []),
+  'recordInvoicePayment' : IDL.Func([EntityId, IDL.Float64], [Result], []),
+  'removeAgent' : IDL.Func([EntityId], [Result], []),
+  'setSuperAdminPrincipal' : IDL.Func([], [Result], []),
+  'toggleAgentAccess' : IDL.Func([EntityId, IDL.Bool], [Result], []),
+  'updateAdvanceVoucher' : IDL.Func(
+      [
+        EntityId,
+        Timestamp,
+        IDL.Opt(EntityId),
+        IDL.Opt(EntityId),
+        IDL.Opt(EntityId),
+        IDL.Opt(EntityId),
+        IDL.Opt(AdvanceType),
+        IDL.Float64,
+        IDL.Opt(PaymentMethod),
+        IDL.Opt(IDL.Text),
+        IDL.Vec(VoucherEntry),
+      ],
+      [Result_2],
+      [],
+    ),
+  'updateAgencyProfile' : IDL.Func(
+      [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text)],
+      [Result_1],
+      [],
+    ),
+  'updateAgencyStatus' : IDL.Func([EntityId, IDL.Bool], [Result], []),
   'updateBooking' : IDL.Func(
       [
         EntityId,
@@ -232,6 +542,57 @@ export const idlService = IDL.Service({
       [Result],
       [],
     ),
+  'updateContraVoucher' : IDL.Func(
+      [EntityId, Timestamp, IDL.Text, IDL.Text, IDL.Float64, IDL.Opt(IDL.Text)],
+      [Result],
+      [],
+    ),
+  'updateHotelVoucher' : IDL.Func(
+      [
+        EntityId,
+        EntityId,
+        IDL.Opt(EntityId),
+        Timestamp,
+        IDL.Vec(HotelVoucherLine),
+        IDL.Opt(IDL.Text),
+      ],
+      [IDL.Opt(HotelVoucher)],
+      [],
+    ),
+  'updateInvoice' : IDL.Func(
+      [EntityId, IDL.Float64, IDL.Opt(IDL.Text)],
+      [Result],
+      [],
+    ),
+  'updateJournalVoucher' : IDL.Func(
+      [EntityId, Timestamp, IDL.Vec(VoucherEntry), IDL.Opt(IDL.Text)],
+      [Result],
+      [],
+    ),
+  'updatePaymentVoucher' : IDL.Func(
+      [
+        EntityId,
+        Timestamp,
+        EntityId,
+        IDL.Float64,
+        PaymentMethod,
+        IDL.Opt(IDL.Text),
+      ],
+      [Result],
+      [],
+    ),
+  'updateReceiptVoucher' : IDL.Func(
+      [
+        EntityId,
+        Timestamp,
+        EntityId,
+        IDL.Float64,
+        PaymentMethod,
+        IDL.Opt(IDL.Text),
+      ],
+      [Result],
+      [],
+    ),
   'updateSettings' : IDL.Func(
       [IDL.Text, IDL.Text, IDL.Nat, IDL.Text, IDL.Nat, IDL.Text],
       [Result],
@@ -242,32 +603,160 @@ export const idlService = IDL.Service({
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
-  const EntityId = IDL.Text;
-  const BookingType = IDL.Variant({
-    'ticket' : IDL.Null,
-    'tour' : IDL.Null,
-    'visa' : IDL.Null,
-    'umrah' : IDL.Null,
-  });
   const Timestamp = IDL.Int;
-  const Result_1 = IDL.Variant({ 'ok' : IDL.Text, 'err' : IDL.Text });
-  const ClientType = IDL.Variant({
-    'client' : IDL.Null,
-    'supplier' : IDL.Null,
-  });
+  const EntityId = IDL.Text;
+  const AdvanceType = IDL.Variant({ 'paid' : IDL.Null, 'received' : IDL.Null });
+  const PaymentMethod = IDL.Variant({ 'bank' : IDL.Null, 'cash' : IDL.Null });
   const VoucherEntry = IDL.Record({
     'accountId' : EntityId,
     'credit' : IDL.Float64,
     'accountName' : IDL.Text,
     'debit' : IDL.Float64,
   });
-  const PaymentMethod = IDL.Variant({ 'bank' : IDL.Null, 'cash' : IDL.Null });
+  const AdvanceVoucher = IDL.Record({
+    'id' : EntityId,
+    'linkedClientId' : IDL.Opt(EntityId),
+    'clientId' : IDL.Opt(EntityId),
+    'linkedSupplierId' : IDL.Opt(EntityId),
+    'paymentMethod' : IDL.Opt(PaymentMethod),
+    'date' : Timestamp,
+    'createdAt' : Timestamp,
+    'createdBy' : IDL.Principal,
+    'entries' : IDL.Vec(VoucherEntry),
+    'advanceType' : IDL.Opt(AdvanceType),
+    'voucherNo' : IDL.Text,
+    'amount' : IDL.Float64,
+    'supplierId' : IDL.Opt(EntityId),
+    'remarks' : IDL.Opt(IDL.Text),
+  });
+  const Result_2 = IDL.Variant({ 'ok' : AdvanceVoucher, 'err' : IDL.Text });
+  const AgentRole = IDL.Variant({ 'agent' : IDL.Null, 'owner' : IDL.Null });
+  const AgentProfile = IDL.Record({
+    'id' : EntityId,
+    'principal' : IDL.Opt(IDL.Principal),
+    'name' : IDL.Text,
+    'createdAt' : Timestamp,
+    'createdBy' : IDL.Principal,
+    'role' : AgentRole,
+    'agencyId' : EntityId,
+    'isActive' : IDL.Bool,
+    'email' : IDL.Text,
+  });
+  const Result_10 = IDL.Variant({ 'ok' : AgentProfile, 'err' : IDL.Text });
+  const BookingType = IDL.Variant({
+    'ticket' : IDL.Null,
+    'tour' : IDL.Null,
+    'visa' : IDL.Null,
+    'umrah' : IDL.Null,
+  });
+  const Result_9 = IDL.Variant({ 'ok' : IDL.Text, 'err' : IDL.Text });
+  const ClientType = IDL.Variant({
+    'client' : IDL.Null,
+    'supplier' : IDL.Null,
+  });
+  const HotelVoucherLine = IDL.Record({
+    'checkIn' : Timestamp,
+    'hotelName' : IDL.Text,
+    'confirmationNo' : IDL.Text,
+    'city' : IDL.Text,
+    'guestName' : IDL.Text,
+    'ratePerNight' : IDL.Float64,
+    'totalAmount' : IDL.Float64,
+    'checkOut' : Timestamp,
+    'nights' : IDL.Nat,
+    'roomType' : IDL.Text,
+    'supplierId' : EntityId,
+  });
+  const HotelVoucher = IDL.Record({
+    'id' : EntityId,
+    'clientId' : EntityId,
+    'date' : Timestamp,
+    'createdAt' : Timestamp,
+    'createdBy' : IDL.Text,
+    'agentId' : IDL.Opt(EntityId),
+    'agencyId' : EntityId,
+    'totalAmount' : IDL.Float64,
+    'voucherNo' : IDL.Text,
+    'hotels' : IDL.Vec(HotelVoucherLine),
+    'remarks' : IDL.Opt(IDL.Text),
+  });
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
+  const Agency = IDL.Record({
+    'id' : EntityId,
+    'timezone' : IDL.Opt(IDL.Text),
+    'country' : IDL.Opt(IDL.Text),
+    'totalAgents' : IDL.Nat,
+    'ownerPrincipal' : IDL.Principal,
+    'createdAt' : Timestamp,
+    'isOnboarded' : IDL.Bool,
+    'isActive' : IDL.Bool,
+    'logoUrl' : IDL.Opt(IDL.Text),
+    'agencyName' : IDL.Text,
+    'phone' : IDL.Opt(IDL.Text),
+  });
+  const Result_1 = IDL.Variant({ 'ok' : Agency, 'err' : IDL.Text });
+  const RefundRequest = IDL.Record({
+    'refundAmount' : IDL.Float64,
+    'invoiceId' : EntityId,
+    'refundDate' : Timestamp,
+    'reason' : IDL.Text,
+  });
+  const InvoiceStatus = IDL.Variant({
+    'paid' : IDL.Null,
+    'unpaid' : IDL.Null,
+    'partial' : IDL.Null,
+  });
+  const InvoiceType = IDL.Variant({
+    'creditNote' : IDL.Null,
+    'booking' : IDL.Null,
+    'manual' : IDL.Null,
+    'debitNote' : IDL.Null,
+    'proforma' : IDL.Null,
+  });
+  const Invoice = IDL.Record({
+    'id' : EntityId,
+    'due' : IDL.Float64,
+    'status' : InvoiceStatus,
+    'clientId' : EntityId,
+    'bookingId' : EntityId,
+    'discountAmount' : IDL.Float64,
+    'createdAt' : Timestamp,
+    'paid' : IDL.Float64,
+    'invoiceNo' : IDL.Text,
+    'invoiceType' : InvoiceType,
+    'notes' : IDL.Opt(IDL.Text),
+    'taxAmount' : IDL.Float64,
+    'amount' : IDL.Float64,
+    'refundedInvoiceId' : IDL.Opt(IDL.Text),
+    'remarks' : IDL.Opt(IDL.Text),
+  });
+  const Result_8 = IDL.Variant({ 'ok' : Invoice, 'err' : IDL.Text });
   const Result = IDL.Variant({ 'ok' : IDL.Null, 'err' : IDL.Text });
+  const ActivityLogEntry = IDL.Record({
+    'id' : EntityId,
+    'description' : IDL.Text,
+    'agencyId' : EntityId,
+    'actorId' : IDL.Opt(IDL.Text),
+    'timestamp' : Timestamp,
+    'eventType' : IDL.Text,
+  });
+  const Result_7 = IDL.Variant({
+    'ok' : IDL.Vec(ActivityLogEntry),
+    'err' : IDL.Text,
+  });
+  const AgencyStats = IDL.Record({
+    'totalBookings' : IDL.Nat,
+    'totalProfit' : IDL.Float64,
+    'activeAgents' : IDL.Nat,
+    'totalRevenue' : IDL.Float64,
+    'lastActivityAt' : IDL.Opt(Timestamp),
+  });
+  const Result_6 = IDL.Variant({ 'ok' : AgencyStats, 'err' : IDL.Text });
+  const Result_5 = IDL.Variant({ 'ok' : IDL.Vec(Agency), 'err' : IDL.Text });
   const BookingStatus = IDL.Variant({
     'cancelled' : IDL.Null,
     'pending' : IDL.Null,
@@ -298,6 +787,20 @@ export const idlFactory = ({ IDL }) => {
     'openingBalance' : IDL.Float64,
     'phone' : IDL.Text,
   });
+  const ClientLedgerSummary = IDL.Record({
+    'totalCredit' : IDL.Float64,
+    'closingBalance' : IDL.Float64,
+    'entityId' : EntityId,
+    'openingBalance' : IDL.Float64,
+    'entityName' : IDL.Text,
+    'totalDebit' : IDL.Float64,
+  });
+  const DailyLedgerSummary = IDL.Record({
+    'totalCredit' : IDL.Float64,
+    'date' : IDL.Text,
+    'netBalance' : IDL.Float64,
+    'totalDebit' : IDL.Float64,
+  });
   const DashboardStats = IDL.Record({
     'todayTransactions' : IDL.Nat,
     'totalReceivable' : IDL.Float64,
@@ -305,21 +808,11 @@ export const idlFactory = ({ IDL }) => {
     'totalSales' : IDL.Float64,
     'totalPayable' : IDL.Float64,
   });
-  const InvoiceStatus = IDL.Variant({
-    'paid' : IDL.Null,
-    'unpaid' : IDL.Null,
-    'partial' : IDL.Null,
-  });
-  const Invoice = IDL.Record({
-    'id' : EntityId,
-    'due' : IDL.Float64,
-    'status' : InvoiceStatus,
-    'clientId' : EntityId,
-    'bookingId' : EntityId,
-    'createdAt' : Timestamp,
-    'paid' : IDL.Float64,
-    'invoiceNo' : IDL.Text,
-    'amount' : IDL.Float64,
+  const InvoicesSummary = IDL.Record({
+    'totalPaid' : IDL.Float64,
+    'totalDue' : IDL.Float64,
+    'totalAmount' : IDL.Float64,
+    'totalInvoices' : IDL.Nat,
   });
   const LedgerEntry = IDL.Record({
     'id' : EntityId,
@@ -333,6 +826,27 @@ export const idlFactory = ({ IDL }) => {
     'voucherNo' : IDL.Text,
     'debit' : IDL.Float64,
   });
+  const Result_4 = IDL.Variant({
+    'ok' : IDL.Vec(AgentProfile),
+    'err' : IDL.Text,
+  });
+  const NotificationType = IDL.Variant({
+    'refundCreated' : IDL.Null,
+    'systemAlert' : IDL.Null,
+    'invoiceOverdue' : IDL.Null,
+    'bookingConfirmed' : IDL.Null,
+    'paymentReceived' : IDL.Null,
+  });
+  const InAppNotification = IDL.Record({
+    'id' : EntityId,
+    'title' : IDL.Text,
+    'notificationType' : NotificationType,
+    'createdAt' : Timestamp,
+    'agencyId' : EntityId,
+    'isRead' : IDL.Bool,
+    'message' : IDL.Text,
+    'relatedId' : IDL.Opt(IDL.Text),
+  });
   const OutstandingEntry = IDL.Record({
     'due' : IDL.Float64,
     'clientName' : IDL.Text,
@@ -340,6 +854,14 @@ export const idlFactory = ({ IDL }) => {
     'invoiceNo' : IDL.Text,
     'amount' : IDL.Float64,
   });
+  const PlatformStats = IDL.Record({
+    'refundRate' : IDL.Float64,
+    'activeAgencies' : IDL.Nat,
+    'totalAgencies' : IDL.Nat,
+    'totalRefunds' : IDL.Float64,
+    'totalRevenue' : IDL.Float64,
+  });
+  const Result_3 = IDL.Variant({ 'ok' : PlatformStats, 'err' : IDL.Text });
   const ProfitLossReport = IDL.Record({
     'grossProfit' : IDL.Float64,
     'totalCost' : IDL.Float64,
@@ -347,6 +869,7 @@ export const idlFactory = ({ IDL }) => {
     'netProfit' : IDL.Float64,
   });
   const Settings = IDL.Record({
+    'hotelVoucherNextNo' : IDL.Nat,
     'invoiceNextNo' : IDL.Nat,
     'voucherNextNo' : IDL.Nat,
     'invoicePrefix' : IDL.Text,
@@ -379,9 +902,40 @@ export const idlFactory = ({ IDL }) => {
     'supplierId' : IDL.Opt(EntityId),
     'remarks' : IDL.Opt(IDL.Text),
   });
+  const VouchersSummary = IDL.Record({
+    'totalReceipts' : IDL.Float64,
+    'totalPayments' : IDL.Float64,
+    'totalAdvances' : IDL.Float64,
+    'totalVouchers' : IDL.Nat,
+  });
+  const WeeklyLedgerSummary = IDL.Record({
+    'endDate' : IDL.Text,
+    'totalCredit' : IDL.Float64,
+    'netBalance' : IDL.Float64,
+    'weekLabel' : IDL.Text,
+    'totalDebit' : IDL.Float64,
+    'startDate' : IDL.Text,
+  });
   
   return IDL.Service({
     '_initializeAccessControl' : IDL.Func([], [], []),
+    'addAdvanceVoucher' : IDL.Func(
+        [
+          Timestamp,
+          IDL.Opt(EntityId),
+          IDL.Opt(EntityId),
+          IDL.Opt(EntityId),
+          IDL.Opt(EntityId),
+          IDL.Opt(AdvanceType),
+          IDL.Float64,
+          IDL.Opt(PaymentMethod),
+          IDL.Opt(IDL.Text),
+          IDL.Vec(VoucherEntry),
+        ],
+        [Result_2],
+        [],
+      ),
+    'addAgent' : IDL.Func([IDL.Text, IDL.Text], [Result_10], []),
     'addBooking' : IDL.Func(
         [
           EntityId,
@@ -393,48 +947,121 @@ export const idlFactory = ({ IDL }) => {
           IDL.Float64,
           IDL.Float64,
         ],
-        [Result_1],
+        [Result_9],
         [],
       ),
     'addClient' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Opt(IDL.Text), IDL.Float64, ClientType],
-        [Result_1],
+        [Result_9],
         [],
       ),
     'addContraVoucher' : IDL.Func(
         [Timestamp, IDL.Text, IDL.Text, IDL.Float64, IDL.Opt(IDL.Text)],
-        [Result_1],
+        [Result_9],
+        [],
+      ),
+    'addHotelVoucher' : IDL.Func(
+        [
+          EntityId,
+          EntityId,
+          IDL.Opt(EntityId),
+          Timestamp,
+          IDL.Vec(HotelVoucherLine),
+          IDL.Opt(IDL.Text),
+        ],
+        [HotelVoucher],
         [],
       ),
     'addJournalVoucher' : IDL.Func(
         [Timestamp, IDL.Vec(VoucherEntry), IDL.Opt(IDL.Text)],
-        [Result_1],
+        [Result_9],
         [],
       ),
     'addPaymentVoucher' : IDL.Func(
         [Timestamp, EntityId, IDL.Float64, PaymentMethod, IDL.Opt(IDL.Text)],
-        [Result_1],
+        [Result_9],
         [],
       ),
     'addReceiptVoucher' : IDL.Func(
         [Timestamp, EntityId, IDL.Float64, PaymentMethod, IDL.Opt(IDL.Text)],
-        [Result_1],
+        [Result_9],
         [],
       ),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'completeOnboarding' : IDL.Func(
+        [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text), IDL.Opt(IDL.Text)],
+        [Result_1],
+        [],
+      ),
+    'createAgency' : IDL.Func([IDL.Text], [Result_1], []),
+    'createRefundInvoice' : IDL.Func([EntityId, RefundRequest], [Result_8], []),
+    'deleteAdvanceVoucher' : IDL.Func([EntityId], [Result], []),
+    'deleteBooking' : IDL.Func([EntityId], [Result], []),
     'deleteClient' : IDL.Func([EntityId], [Result], []),
+    'deleteHotelVoucher' : IDL.Func([EntityId], [IDL.Bool], []),
+    'deleteInvoice' : IDL.Func([EntityId], [Result], []),
+    'deleteNotification' : IDL.Func([EntityId], [IDL.Bool], []),
+    'deleteVoucher' : IDL.Func([EntityId], [Result], []),
+    'getAdvanceVoucherById' : IDL.Func(
+        [EntityId],
+        [IDL.Opt(AdvanceVoucher)],
+        ['query'],
+      ),
+    'getAdvanceVouchers' : IDL.Func([], [IDL.Vec(AdvanceVoucher)], ['query']),
+    'getAgencyActivityLog' : IDL.Func([EntityId], [Result_7], ['query']),
+    'getAgencyStats' : IDL.Func([EntityId], [Result_6], ['query']),
+    'getAgentProfile' : IDL.Func([], [IDL.Opt(AgentProfile)], ['query']),
+    'getAllAgencies' : IDL.Func([], [Result_5], ['query']),
     'getBookingById' : IDL.Func([EntityId], [IDL.Opt(Booking)], ['query']),
     'getBookings' : IDL.Func([], [IDL.Vec(Booking)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getClientById' : IDL.Func([EntityId], [IDL.Opt(Client)], ['query']),
+    'getClientLedgerSummaries' : IDL.Func(
+        [],
+        [IDL.Vec(ClientLedgerSummary)],
+        ['query'],
+      ),
     'getClients' : IDL.Func([], [IDL.Vec(Client)], ['query']),
+    'getDailyLedgerSummary' : IDL.Func(
+        [Timestamp, Timestamp],
+        [IDL.Vec(DailyLedgerSummary)],
+        ['query'],
+      ),
     'getDashboardStats' : IDL.Func([], [DashboardStats], ['query']),
+    'getHotelVoucherById' : IDL.Func(
+        [EntityId],
+        [IDL.Opt(HotelVoucher)],
+        ['query'],
+      ),
+    'getHotelVouchers' : IDL.Func(
+        [EntityId],
+        [IDL.Vec(HotelVoucher)],
+        ['query'],
+      ),
     'getInvoiceById' : IDL.Func([EntityId], [IDL.Opt(Invoice)], ['query']),
     'getInvoices' : IDL.Func([], [IDL.Vec(Invoice)], ['query']),
     'getInvoicesByClient' : IDL.Func([EntityId], [IDL.Vec(Invoice)], ['query']),
+    'getInvoicesByStatus' : IDL.Func(
+        [InvoiceStatus],
+        [IDL.Vec(Invoice)],
+        ['query'],
+      ),
+    'getInvoicesByType' : IDL.Func(
+        [InvoiceType],
+        [IDL.Vec(Invoice)],
+        ['query'],
+      ),
+    'getInvoicesSummary' : IDL.Func([], [InvoicesSummary], ['query']),
     'getLedgerByEntity' : IDL.Func(
         [EntityId],
         [IDL.Vec(LedgerEntry)],
+        ['query'],
+      ),
+    'getMyAgency' : IDL.Func([], [IDL.Opt(Agency)], ['query']),
+    'getMyAgents' : IDL.Func([], [Result_4], ['query']),
+    'getNotifications' : IDL.Func(
+        [EntityId],
+        [IDL.Vec(InAppNotification)],
         ['query'],
       ),
     'getOutstandingReport' : IDL.Func(
@@ -442,18 +1069,58 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(OutstandingEntry)],
         ['query'],
       ),
+    'getPlatformStats' : IDL.Func([], [Result_3], ['query']),
     'getProfitLossReport' : IDL.Func([], [ProfitLossReport], ['query']),
     'getRunningBalance' : IDL.Func([EntityId], [IDL.Float64], ['query']),
     'getSettings' : IDL.Func([], [Settings], ['query']),
     'getSuppliers' : IDL.Func([], [IDL.Vec(Client)], ['query']),
     'getTrialBalance' : IDL.Func([], [IDL.Vec(TrialBalanceEntry)], ['query']),
+    'getUnreadNotificationCount' : IDL.Func([EntityId], [IDL.Nat], ['query']),
+    'getVoucherById' : IDL.Func([EntityId], [IDL.Opt(Voucher)], ['query']),
     'getVouchers' : IDL.Func([], [IDL.Vec(Voucher)], ['query']),
     'getVouchersByType' : IDL.Func(
         [VoucherType],
         [IDL.Vec(Voucher)],
         ['query'],
       ),
+    'getVouchersSummary' : IDL.Func([], [VouchersSummary], ['query']),
+    'getWeeklyLedgerSummary' : IDL.Func(
+        [Timestamp, Timestamp],
+        [IDL.Vec(WeeklyLedgerSummary)],
+        ['query'],
+      ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'isSuperAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'linkMyAgentPrincipal' : IDL.Func([EntityId, IDL.Principal], [Result], []),
+    'markAllNotificationsRead' : IDL.Func([EntityId], [IDL.Nat], []),
+    'markNotificationRead' : IDL.Func([EntityId], [IDL.Bool], []),
+    'recordInvoicePayment' : IDL.Func([EntityId, IDL.Float64], [Result], []),
+    'removeAgent' : IDL.Func([EntityId], [Result], []),
+    'setSuperAdminPrincipal' : IDL.Func([], [Result], []),
+    'toggleAgentAccess' : IDL.Func([EntityId, IDL.Bool], [Result], []),
+    'updateAdvanceVoucher' : IDL.Func(
+        [
+          EntityId,
+          Timestamp,
+          IDL.Opt(EntityId),
+          IDL.Opt(EntityId),
+          IDL.Opt(EntityId),
+          IDL.Opt(EntityId),
+          IDL.Opt(AdvanceType),
+          IDL.Float64,
+          IDL.Opt(PaymentMethod),
+          IDL.Opt(IDL.Text),
+          IDL.Vec(VoucherEntry),
+        ],
+        [Result_2],
+        [],
+      ),
+    'updateAgencyProfile' : IDL.Func(
+        [IDL.Opt(IDL.Text), IDL.Opt(IDL.Text)],
+        [Result_1],
+        [],
+      ),
+    'updateAgencyStatus' : IDL.Func([EntityId, IDL.Bool], [Result], []),
     'updateBooking' : IDL.Func(
         [
           EntityId,
@@ -472,6 +1139,64 @@ export const idlFactory = ({ IDL }) => {
       ),
     'updateClient' : IDL.Func(
         [EntityId, IDL.Text, IDL.Text, IDL.Opt(IDL.Text), IDL.Float64],
+        [Result],
+        [],
+      ),
+    'updateContraVoucher' : IDL.Func(
+        [
+          EntityId,
+          Timestamp,
+          IDL.Text,
+          IDL.Text,
+          IDL.Float64,
+          IDL.Opt(IDL.Text),
+        ],
+        [Result],
+        [],
+      ),
+    'updateHotelVoucher' : IDL.Func(
+        [
+          EntityId,
+          EntityId,
+          IDL.Opt(EntityId),
+          Timestamp,
+          IDL.Vec(HotelVoucherLine),
+          IDL.Opt(IDL.Text),
+        ],
+        [IDL.Opt(HotelVoucher)],
+        [],
+      ),
+    'updateInvoice' : IDL.Func(
+        [EntityId, IDL.Float64, IDL.Opt(IDL.Text)],
+        [Result],
+        [],
+      ),
+    'updateJournalVoucher' : IDL.Func(
+        [EntityId, Timestamp, IDL.Vec(VoucherEntry), IDL.Opt(IDL.Text)],
+        [Result],
+        [],
+      ),
+    'updatePaymentVoucher' : IDL.Func(
+        [
+          EntityId,
+          Timestamp,
+          EntityId,
+          IDL.Float64,
+          PaymentMethod,
+          IDL.Opt(IDL.Text),
+        ],
+        [Result],
+        [],
+      ),
+    'updateReceiptVoucher' : IDL.Func(
+        [
+          EntityId,
+          Timestamp,
+          EntityId,
+          IDL.Float64,
+          PaymentMethod,
+          IDL.Opt(IDL.Text),
+        ],
         [Result],
         [],
       ),

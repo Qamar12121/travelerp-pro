@@ -1,3 +1,19 @@
+type WeeklyLedgerSummary = 
+ record {
+   endDate: text;
+   netBalance: float64;
+   startDate: text;
+   totalCredit: float64;
+   totalDebit: float64;
+   weekLabel: text;
+ };
+type VouchersSummary = 
+ record {
+   totalAdvances: float64;
+   totalPayments: float64;
+   totalReceipts: float64;
+   totalVouchers: nat;
+ };
 type VoucherType = 
  variant {
    contra;
@@ -44,20 +60,73 @@ type Settings =
  record {
    agencyName: text;
    currency: text;
+   hotelVoucherNextNo: nat;
    invoiceNextNo: nat;
    invoicePrefix: text;
    voucherNextNo: nat;
    voucherPrefix: text;
  };
-type Result_1 = 
+type Result_9 = 
  variant {
    err: text;
    ok: text;
+ };
+type Result_8 = 
+ variant {
+   err: text;
+   ok: Invoice;
+ };
+type Result_7 = 
+ variant {
+   err: text;
+   ok: vec ActivityLogEntry;
+ };
+type Result_6 = 
+ variant {
+   err: text;
+   ok: AgencyStats;
+ };
+type Result_5 = 
+ variant {
+   err: text;
+   ok: vec Agency;
+ };
+type Result_4 = 
+ variant {
+   err: text;
+   ok: vec AgentProfile;
+ };
+type Result_3 = 
+ variant {
+   err: text;
+   ok: PlatformStats;
+ };
+type Result_2 = 
+ variant {
+   err: text;
+   ok: AdvanceVoucher;
+ };
+type Result_10 = 
+ variant {
+   err: text;
+   ok: AgentProfile;
+ };
+type Result_1 = 
+ variant {
+   err: text;
+   ok: Agency;
  };
 type Result = 
  variant {
    err: text;
    ok;
+ };
+type RefundRequest = 
+ record {
+   invoiceId: EntityId;
+   reason: text;
+   refundAmount: float64;
+   refundDate: Timestamp;
  };
 type ProfitLossReport = 
  record {
@@ -65,6 +134,14 @@ type ProfitLossReport =
    netProfit: float64;
    totalCost: float64;
    totalSales: float64;
+ };
+type PlatformStats = 
+ record {
+   activeAgencies: nat;
+   refundRate: float64;
+   totalAgencies: nat;
+   totalRefunds: float64;
+   totalRevenue: float64;
  };
 type PaymentMethod = 
  variant {
@@ -79,6 +156,14 @@ type OutstandingEntry =
    invoiceNo: text;
    paid: float64;
  };
+type NotificationType = 
+ variant {
+   bookingConfirmed;
+   invoiceOverdue;
+   paymentReceived;
+   refundCreated;
+   systemAlert;
+ };
 type LedgerEntry = 
  record {
    balance: float64;
@@ -92,6 +177,21 @@ type LedgerEntry =
    voucherNo: text;
    voucherType: text;
  };
+type InvoicesSummary = 
+ record {
+   totalAmount: float64;
+   totalDue: float64;
+   totalInvoices: nat;
+   totalPaid: float64;
+ };
+type InvoiceType = 
+ variant {
+   booking;
+   creditNote;
+   debitNote;
+   manual;
+   proforma;
+ };
 type InvoiceStatus = 
  variant {
    paid;
@@ -104,11 +204,56 @@ type Invoice =
    bookingId: EntityId;
    clientId: EntityId;
    createdAt: Timestamp;
+   discountAmount: float64;
    due: float64;
    id: EntityId;
    invoiceNo: text;
+   invoiceType: InvoiceType;
+   notes: opt text;
    paid: float64;
+   refundedInvoiceId: opt text;
+   remarks: opt text;
    status: InvoiceStatus;
+   taxAmount: float64;
+ };
+type InAppNotification = 
+ record {
+   agencyId: EntityId;
+   createdAt: Timestamp;
+   id: EntityId;
+   isRead: bool;
+   message: text;
+   notificationType: NotificationType;
+   relatedId: opt text;
+   title: text;
+ };
+type HotelVoucherLine = 
+ record {
+   checkIn: Timestamp;
+   checkOut: Timestamp;
+   city: text;
+   confirmationNo: text;
+   guestName: text;
+   hotelName: text;
+   nights: nat;
+   ratePerNight: float64;
+   roomType: text;
+   supplierId: EntityId;
+   totalAmount: float64;
+ };
+type HotelVoucher = 
+ record {
+   agencyId: EntityId;
+   agentId: opt EntityId;
+   clientId: EntityId;
+   createdAt: Timestamp;
+   createdBy: text;
+   date: Timestamp;
+   hotels: vec HotelVoucherLine;
+   id: EntityId;
+   remarks: opt text;
+   totalAmount: float64;
+   voucherNo: text;
  };
 type EntityId = text;
 type DashboardStats = 
@@ -119,10 +264,26 @@ type DashboardStats =
    totalReceivable: float64;
    totalSales: float64;
  };
+type DailyLedgerSummary = 
+ record {
+   date: text;
+   netBalance: float64;
+   totalCredit: float64;
+   totalDebit: float64;
+ };
 type ClientType = 
  variant {
    client;
    supplier;
+ };
+type ClientLedgerSummary = 
+ record {
+   closingBalance: float64;
+   entityId: EntityId;
+   entityName: text;
+   openingBalance: float64;
+   totalCredit: float64;
+   totalDebit: float64;
  };
 type Client = 
  record {
@@ -164,48 +325,191 @@ type Booking =
    status: BookingStatus;
    travelDate: opt Timestamp;
  };
+type AgentRole = 
+ variant {
+   agent;
+   owner;
+ };
+type AgentProfile = 
+ record {
+   agencyId: EntityId;
+   createdAt: Timestamp;
+   createdBy: principal;
+   email: text;
+   id: EntityId;
+   isActive: bool;
+   name: text;
+   "principal": opt principal;
+   role: AgentRole;
+ };
+type AgencyStats = 
+ record {
+   activeAgents: nat;
+   lastActivityAt: opt Timestamp;
+   totalBookings: nat;
+   totalProfit: float64;
+   totalRevenue: float64;
+ };
+type Agency = 
+ record {
+   agencyName: text;
+   country: opt text;
+   createdAt: Timestamp;
+   id: EntityId;
+   isActive: bool;
+   isOnboarded: bool;
+   logoUrl: opt text;
+   ownerPrincipal: principal;
+   phone: opt text;
+   timezone: opt text;
+   totalAgents: nat;
+ };
+type AdvanceVoucher = 
+ record {
+   advanceType: opt AdvanceType;
+   amount: float64;
+   clientId: opt EntityId;
+   createdAt: Timestamp;
+   createdBy: principal;
+   date: Timestamp;
+   entries: vec VoucherEntry;
+   id: EntityId;
+   linkedClientId: opt EntityId;
+   linkedSupplierId: opt EntityId;
+   paymentMethod: opt PaymentMethod;
+   remarks: opt text;
+   supplierId: opt EntityId;
+   voucherNo: text;
+ };
+type AdvanceType = 
+ variant {
+   paid;
+   received;
+ };
+type ActivityLogEntry = 
+ record {
+   actorId: opt text;
+   agencyId: EntityId;
+   description: text;
+   eventType: text;
+   id: EntityId;
+   timestamp: Timestamp;
+ };
 service : {
   _initializeAccessControl: () -> ();
+  addAdvanceVoucher: (date: Timestamp, clientId: opt EntityId, supplierId:
+   opt EntityId, linkedClientId: opt EntityId, linkedSupplierId:
+   opt EntityId, advanceType: opt AdvanceType, amount: float64,
+   paymentMethod: opt PaymentMethod, remarks: opt text, entries:
+   vec VoucherEntry) -> (Result_2);
+  addAgent: (name: text, email: text) -> (Result_10);
   addBooking: (clientId: EntityId, bookingType: BookingType, pnr: opt text,
    sector: opt text, airline: opt text, travelDate: opt Timestamp, netFare:
-   float64, saleFare: float64) -> (Result_1);
+   float64, saleFare: float64) -> (Result_9);
   addClient: (name: text, phone: text, email: opt text, openingBalance:
-   float64, clientType: ClientType) -> (Result_1);
+   float64, clientType: ClientType) -> (Result_9);
   addContraVoucher: (date: Timestamp, fromAccount: text, toAccount: text,
-   amount: float64, remarks: opt text) -> (Result_1);
+   amount: float64, remarks: opt text) -> (Result_9);
+  addHotelVoucher: (clientId: EntityId, agencyId: EntityId, agentId:
+   opt EntityId, date: Timestamp, hotels: vec HotelVoucherLine, remarks:
+   opt text) -> (HotelVoucher);
   addJournalVoucher: (date: Timestamp, entries: vec VoucherEntry, remarks:
-   opt text) -> (Result_1);
+   opt text) -> (Result_9);
   addPaymentVoucher: (date: Timestamp, supplierId: EntityId, amount: 
-   float64, paymentMethod: PaymentMethod, remarks: opt text) -> (Result_1);
+   float64, paymentMethod: PaymentMethod, remarks: opt text) -> (Result_9);
   addReceiptVoucher: (date: Timestamp, clientId: EntityId, amount: float64,
-   paymentMethod: PaymentMethod, remarks: opt text) -> (Result_1);
+   paymentMethod: PaymentMethod, remarks: opt text) -> (Result_9);
   assignCallerUserRole: (user: principal, role: UserRole) -> ();
+  completeOnboarding: (phone: opt text, country: opt text, timezone:
+   opt text) -> (Result_1);
+  createAgency: (agencyName: text) -> (Result_1);
+  createRefundInvoice: (agencyId: EntityId, req: RefundRequest) -> (Result_8);
+  deleteAdvanceVoucher: (id: EntityId) -> (Result);
+  deleteBooking: (id: EntityId) -> (Result);
   deleteClient: (id: EntityId) -> (Result);
+  deleteHotelVoucher: (id: EntityId) -> (bool);
+  deleteInvoice: (id: EntityId) -> (Result);
+  deleteNotification: (id: EntityId) -> (bool);
+  deleteVoucher: (id: EntityId) -> (Result);
+  getAdvanceVoucherById: (id: EntityId) -> (opt AdvanceVoucher) query;
+  getAdvanceVouchers: () -> (vec AdvanceVoucher) query;
+  getAgencyActivityLog: (agencyId: EntityId) -> (Result_7) query;
+  getAgencyStats: (agencyId: EntityId) -> (Result_6) query;
+  getAgentProfile: () -> (opt AgentProfile) query;
+  getAllAgencies: () -> (Result_5) query;
   getBookingById: (id: EntityId) -> (opt Booking) query;
   getBookings: () -> (vec Booking) query;
   getCallerUserRole: () -> (UserRole) query;
   getClientById: (id: EntityId) -> (opt Client) query;
+  getClientLedgerSummaries: () -> (vec ClientLedgerSummary) query;
   getClients: () -> (vec Client) query;
+  getDailyLedgerSummary: (startDate: Timestamp, endDate: Timestamp) ->
+   (vec DailyLedgerSummary) query;
   getDashboardStats: () -> (DashboardStats) query;
+  getHotelVoucherById: (id: EntityId) -> (opt HotelVoucher) query;
+  getHotelVouchers: (agencyId: EntityId) -> (vec HotelVoucher) query;
   getInvoiceById: (id: EntityId) -> (opt Invoice) query;
   getInvoices: () -> (vec Invoice) query;
   getInvoicesByClient: (clientId: EntityId) -> (vec Invoice) query;
+  getInvoicesByStatus: (status: InvoiceStatus) -> (vec Invoice) query;
+  getInvoicesByType: (invoiceType: InvoiceType) -> (vec Invoice) query;
+  getInvoicesSummary: () -> (InvoicesSummary) query;
   getLedgerByEntity: (entityId: EntityId) -> (vec LedgerEntry) query;
+  getMyAgency: () -> (opt Agency) query;
+  getMyAgents: () -> (Result_4) query;
+  getNotifications: (agencyId: EntityId) -> (vec InAppNotification) query;
   getOutstandingReport: () -> (vec OutstandingEntry) query;
+  getPlatformStats: () -> (Result_3) query;
   getProfitLossReport: () -> (ProfitLossReport) query;
   getRunningBalance: (entityId: EntityId) -> (float64) query;
   getSettings: () -> (Settings) query;
   getSuppliers: () -> (vec Client) query;
   getTrialBalance: () -> (vec TrialBalanceEntry) query;
+  getUnreadNotificationCount: (agencyId: EntityId) -> (nat) query;
+  getVoucherById: (id: EntityId) -> (opt Voucher) query;
   getVouchers: () -> (vec Voucher) query;
   getVouchersByType: (voucherType: VoucherType) -> (vec Voucher) query;
+  getVouchersSummary: () -> (VouchersSummary) query;
+  getWeeklyLedgerSummary: (startDate: Timestamp, endDate: Timestamp) ->
+   (vec WeeklyLedgerSummary) query;
   isCallerAdmin: () -> (bool) query;
+  isSuperAdmin: () -> (bool) query;
+  linkMyAgentPrincipal: (agentId: EntityId, agentPrincipal: principal) ->
+   (Result);
+  markAllNotificationsRead: (agencyId: EntityId) -> (nat);
+  markNotificationRead: (id: EntityId) -> (bool);
+  recordInvoicePayment: (id: EntityId, amount: float64) -> (Result);
+  removeAgent: (agentId: EntityId) -> (Result);
+  setSuperAdminPrincipal: () -> (Result);
+  toggleAgentAccess: (agentId: EntityId, isActive: bool) -> (Result);
+  updateAdvanceVoucher: (id: EntityId, date: Timestamp, clientId:
+   opt EntityId, supplierId: opt EntityId, linkedClientId: opt EntityId,
+   linkedSupplierId: opt EntityId, advanceType: opt AdvanceType, amount:
+   float64, paymentMethod: opt PaymentMethod, remarks: opt text, entries:
+   vec VoucherEntry) -> (Result_2);
+  updateAgencyProfile: (newName: opt text, newLogoUrl: opt text) ->
+   (Result_1);
+  updateAgencyStatus: (agencyId: EntityId, isActive: bool) -> (Result);
   updateBooking: (id: EntityId, clientId: EntityId, bookingType: BookingType,
    pnr: opt text, sector: opt text, airline: opt text, travelDate:
    opt Timestamp, netFare: float64, saleFare: float64, status:
    BookingStatus) -> (Result);
   updateClient: (id: EntityId, name: text, phone: text, email: opt text,
    openingBalance: float64) -> (Result);
+  updateContraVoucher: (id: EntityId, date: Timestamp, fromAccount: text,
+   toAccount: text, amount: float64, remarks: opt text) -> (Result);
+  updateHotelVoucher: (id: EntityId, clientId: EntityId, agentId:
+   opt EntityId, date: Timestamp, hotels: vec HotelVoucherLine, remarks:
+   opt text) -> (opt HotelVoucher);
+  updateInvoice: (id: EntityId, paid: float64, remarks: opt text) -> (Result);
+  updateJournalVoucher: (id: EntityId, date: Timestamp, entries:
+   vec VoucherEntry, remarks: opt text) -> (Result);
+  updatePaymentVoucher: (id: EntityId, date: Timestamp, supplierId: EntityId,
+   amount: float64, paymentMethod: PaymentMethod, remarks: opt text) ->
+   (Result);
+  updateReceiptVoucher: (id: EntityId, date: Timestamp, clientId: EntityId,
+   amount: float64, paymentMethod: PaymentMethod, remarks: opt text) ->
+   (Result);
   updateSettings: (currency: text, invoicePrefix: text, invoiceNextNo: 
    nat, voucherPrefix: text, voucherNextNo: nat, agencyName: text) ->
    (Result);

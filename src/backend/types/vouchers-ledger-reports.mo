@@ -71,6 +71,7 @@ module {
     invoiceNextNo : Nat;
     voucherPrefix : Text;
     voucherNextNo : Nat;
+    hotelVoucherNextNo : Nat;
     agencyName : Text;
   };
 };

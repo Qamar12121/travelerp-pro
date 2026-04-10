@@ -1,4 +1,58 @@
-// Version: 1.0.0
+// Version: 3.0.0
+type ActivityLogEntry__360061656 =
+  {
+    actorId : ?Text;
+    agencyId : EntityId__892221652;
+    description : Text;
+    eventType : Text;
+    id : EntityId__892221652;
+    timestamp : Timestamp__301639476
+  };
+type AdvanceType__1021783920 = {#paid; #received};
+type AdvanceVoucher__484432513 =
+  {
+    advanceType : ?AdvanceType__1021783920;
+    amount : Float;
+    clientId : ?EntityId__892221652;
+    createdAt : Timestamp__301639476;
+    createdBy : Principal;
+    date : Timestamp__301639476;
+    entries : [VoucherEntry__530522128];
+    id : EntityId__892221652;
+    linkedClientId : ?EntityId__892221652;
+    linkedSupplierId : ?EntityId__892221652;
+    paymentMethod : ?PaymentMethod__46913440;
+    remarks : ?Text;
+    supplierId : ?EntityId__892221652;
+    voucherNo : Text
+  };
+type Agency__228741372 =
+  {
+    agencyName : Text;
+    country : ?Text;
+    createdAt : Timestamp__301639476;
+    id : EntityId__892221652;
+    isActive : Bool;
+    isOnboarded : Bool;
+    logoUrl : ?Text;
+    ownerPrincipal : Principal;
+    phone : ?Text;
+    timezone : ?Text;
+    totalAgents : Nat
+  };
+type AgentProfile__50395637 =
+  {
+    agencyId : EntityId__892221652;
+    createdAt : Timestamp__301639476;
+    createdBy : Principal;
+    email : Text;
+    id : EntityId__892221652;
+    isActive : Bool;
+    name : Text;
+    principal : ?Principal;
+    role : AgentRole__454086129
+  };
+type AgentRole__454086129 = {#agent; #owner};
 type BookingStatus__96719981 = {#cancelled; #confirmed; #pending};
 type BookingType__102278699 = {#ticket; #tour; #umrah; #visa};
 type Booking__292638 =
@@ -32,20 +86,67 @@ type Client__1072228534 =
 type Data__791452850<K, V> =
   {var count : Nat__490723111; kvs : [var ?(K, V)]};
 type EntityId__892221652 = Text;
+type HotelVoucherLine__149866309 =
+  {
+    checkIn : Timestamp__301639476;
+    checkOut : Timestamp__301639476;
+    city : Text;
+    confirmationNo : Text;
+    guestName : Text;
+    hotelName : Text;
+    nights : Nat;
+    ratePerNight : Float;
+    roomType : Text;
+    supplierId : EntityId__892221652;
+    totalAmount : Float
+  };
+type HotelVoucher__129058512 =
+  {
+    agencyId : EntityId__892221652;
+    agentId : ?EntityId__892221652;
+    clientId : EntityId__892221652;
+    createdAt : Timestamp__301639476;
+    createdBy : Text;
+    date : Timestamp__301639476;
+    hotels : [HotelVoucherLine__149866309];
+    id : EntityId__892221652;
+    remarks : ?Text;
+    totalAmount : Float;
+    voucherNo : Text
+  };
+type InAppNotification__120803294 =
+  {
+    agencyId : EntityId__892221652;
+    createdAt : Timestamp__301639476;
+    id : EntityId__892221652;
+    isRead : Bool;
+    message : Text;
+    notificationType : NotificationType__908192046;
+    relatedId : ?Text;
+    title : Text
+  };
 type Internal__8484328<K, V> =
   {children : [var ?Node__46230540<K, V>]; data : Data__791452850<K, V>};
 type InvoiceStatus__932546339 = {#paid; #partial; #unpaid};
+type InvoiceType__529703152 =
+  {#booking; #creditNote; #debitNote; #manual; #proforma};
 type Invoice__381079582 =
   {
     amount : Float;
     bookingId : EntityId__892221652;
     clientId : EntityId__892221652;
     createdAt : Timestamp__301639476;
+    discountAmount : Float;
     due : Float;
     id : EntityId__892221652;
     invoiceNo : Text;
+    invoiceType : InvoiceType__529703152;
+    notes : ?Text;
     paid : Float;
-    status : InvoiceStatus__932546339
+    refundedInvoiceId : ?Text;
+    remarks : ?Text;
+    status : InvoiceStatus__932546339;
+    taxAmount : Float
   };
 type Leaf__809889148<K, V> = {data : Data__791452850<K, V>};
 type LedgerEntry__443656227 =
@@ -69,6 +170,50 @@ type Nat__490723111 = Nat__920180692;
 type Nat__920180692 = Nat;
 type Node__46230540<K, V> =
   {#internal : Internal__8484328<K, V>; #leaf : Leaf__809889148<K, V>};
+type NotificationType__908192046 =
+  {
+    #bookingConfirmed;
+    #invoiceOverdue;
+    #paymentReceived;
+    #refundCreated;
+    #systemAlert
+  };
+type OldAgency__355097191 =
+  {
+    agencyName : Text;
+    createdAt : Timestamp__301639476;
+    id : EntityId__892221652;
+    isActive : Bool;
+    logoUrl : ?Text;
+    ownerPrincipal : Principal;
+    totalAgents : Nat
+  };
+type OldAppSettings__893977289 =
+  {
+    var agencyName : Text;
+    var currency : Text;
+    var invoiceNextNo : Nat;
+    var invoicePrefix : Text;
+    var voucherNextNo : Nat;
+    var voucherPrefix : Text
+  };
+type OldInvoice__117248841 =
+  {
+    amount : Float;
+    bookingId : EntityId__892221652;
+    clientId : EntityId__892221652;
+    createdAt : Timestamp__301639476;
+    discountAmount : Float;
+    due : Float;
+    id : EntityId__892221652;
+    invoiceNo : Text;
+    invoiceType : InvoiceType__529703152;
+    notes : ?Text;
+    paid : Float;
+    remarks : ?Text;
+    status : InvoiceStatus__932546339;
+    taxAmount : Float
+  };
 type PaymentMethod__46913440 = {#bank; #cash};
 type Timestamp__301639476 = Int;
 type UserRole__1054455867 = {#admin; #guest; #user};
@@ -79,6 +224,7 @@ type VoucherEntry__342036115 =
     credit : Float;
     debit : Float
   };
+type VoucherEntry__530522128 = VoucherEntry__342036115;
 type VoucherType__561003931 = {#contra; #journal; #payment; #receipt};
 type Voucher__468983601 =
   {
@@ -95,16 +241,115 @@ type Voucher__468983601 =
     voucherNo : Text;
     voucherType : VoucherType__561003931
   };
-actor {
+actor ({
   stable accessControlState :
     {
       var adminAssigned : Bool;
       userRoles : Map__605269027<Principal, UserRole__1054455867>
     };
+  stable activityLog :
+    {
+      var root :
+        Node__46230540<EntityId__892221652, ActivityLogEntry__360061656>;
+      var size : Nat__490723111
+    };
+  stable activityLogIdCounter : {var next : Nat};
+  stable advanceVouchers :
+    {
+      var root :
+        Node__46230540<EntityId__892221652, AdvanceVoucher__484432513>;
+      var size : Nat__490723111
+    };
+  in agencies : Map__605269027<EntityId__892221652, OldAgency__355097191>;
+  stable agencyIdCounter : {var next : Nat};
+  stable agentProfiles :
+    {
+      var root : Node__46230540<EntityId__892221652, AgentProfile__50395637>;
+      var size : Nat__490723111
+    };
+  in appSettings : OldAppSettings__893977289;
+  stable bookings :
+    {
+      var root : Node__46230540<EntityId__892221652, Booking__292638>;
+      var size : Nat__490723111
+    };
+  stable clientIdCounter : {var next : Nat};
+  stable clients :
+    {
+      var root : Node__46230540<EntityId__892221652, Client__1072228534>;
+      var size : Nat__490723111
+    };
+  stable hotelVoucherIdCounter : {var next : Nat};
+  stable hotelVouchers :
+    {
+      var root : Node__46230540<EntityId__892221652, HotelVoucher__129058512>;
+      var size : Nat__490723111
+    };
+  in invoices : Map__605269027<EntityId__892221652, OldInvoice__117248841>;
+  stable ledger :
+    {
+      var blockIndex : Nat__490723111;
+      var blocks : [var [var ?LedgerEntry__443656227]];
+      var elementIndex : Nat__490723111
+    };
+  stable notificationIdCounter : {var next : Nat};
+  stable notifications :
+    {
+      var root :
+        Node__46230540<EntityId__892221652, InAppNotification__120803294>;
+      var size : Nat__490723111
+    };
+  stable principalToAgency :
+    {
+      var root : Node__46230540<Principal, EntityId__892221652>;
+      var size : Nat__490723111
+    };
+  stable principalToAgent :
+    {
+      var root : Node__46230540<Principal, EntityId__892221652>;
+      var size : Nat__490723111
+    };
+  stable superAdminRef : {var superAdmin : ?Principal};
+  stable vouchers :
+    {
+      var root : Node__46230540<EntityId__892221652, Voucher__468983601>;
+      var size : Nat__490723111
+    }
+}, {
+  stable accessControlState :
+    {
+      var adminAssigned : Bool;
+      userRoles : Map__605269027<Principal, UserRole__1054455867>
+    };
+  stable activityLog :
+    {
+      var root :
+        Node__46230540<EntityId__892221652, ActivityLogEntry__360061656>;
+      var size : Nat__490723111
+    };
+  stable activityLogIdCounter : {var next : Nat};
+  stable advanceVouchers :
+    {
+      var root :
+        Node__46230540<EntityId__892221652, AdvanceVoucher__484432513>;
+      var size : Nat__490723111
+    };
+  stable agencies :
+    {
+      var root : Node__46230540<EntityId__892221652, Agency__228741372>;
+      var size : Nat__490723111
+    };
+  stable agencyIdCounter : {var next : Nat};
+  stable agentProfiles :
+    {
+      var root : Node__46230540<EntityId__892221652, AgentProfile__50395637>;
+      var size : Nat__490723111
+    };
   stable appSettings :
     {
       var agencyName : Text;
       var currency : Text;
+      var hotelVoucherNextNo : Nat;
       var invoiceNextNo : Nat;
       var invoicePrefix : Text;
       var voucherNextNo : Nat;
@@ -121,6 +366,12 @@ actor {
       var root : Node__46230540<EntityId__892221652, Client__1072228534>;
       var size : Nat__490723111
     };
+  stable hotelVoucherIdCounter : {var next : Nat};
+  stable hotelVouchers :
+    {
+      var root : Node__46230540<EntityId__892221652, HotelVoucher__129058512>;
+      var size : Nat__490723111
+    };
   stable invoices :
     {
       var root : Node__46230540<EntityId__892221652, Invoice__381079582>;
@@ -132,9 +383,27 @@ actor {
       var blocks : [var [var ?LedgerEntry__443656227]];
       var elementIndex : Nat__490723111
     };
+  stable notificationIdCounter : {var next : Nat};
+  stable notifications :
+    {
+      var root :
+        Node__46230540<EntityId__892221652, InAppNotification__120803294>;
+      var size : Nat__490723111
+    };
+  stable principalToAgency :
+    {
+      var root : Node__46230540<Principal, EntityId__892221652>;
+      var size : Nat__490723111
+    };
+  stable principalToAgent :
+    {
+      var root : Node__46230540<Principal, EntityId__892221652>;
+      var size : Nat__490723111
+    };
+  stable superAdminRef : {var superAdmin : ?Principal};
   stable vouchers :
     {
       var root : Node__46230540<EntityId__892221652, Voucher__468983601>;
       var size : Nat__490723111
     }
-};
+}) ;

@@ -11,6 +11,7 @@ mixin (
     var invoiceNextNo : Nat;
     var voucherPrefix : Text;
     var voucherNextNo : Nat;
+    var hotelVoucherNextNo : Nat;
     var agencyName : Text;
   },
 ) {
@@ -21,6 +22,7 @@ mixin (
       invoiceNextNo = appSettings.invoiceNextNo;
       voucherPrefix = appSettings.voucherPrefix;
       voucherNextNo = appSettings.voucherNextNo;
+      hotelVoucherNextNo = appSettings.hotelVoucherNextNo;
       agencyName = appSettings.agencyName;
     };
   };

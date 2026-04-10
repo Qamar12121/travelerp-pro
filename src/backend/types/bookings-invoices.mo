@@ -27,6 +27,19 @@ module {
     paid : Float;
     due : Float;
     status : Common.InvoiceStatus;
+    invoiceType : Common.InvoiceType;
+    taxAmount : Float;
+    discountAmount : Float;
+    notes : ?Text;
+    remarks : ?Text;
+    refundedInvoiceId : ?Text;
     createdAt : Common.Timestamp;
+  };
+
+  public type InvoicesSummary = {
+    totalInvoices : Nat;
+    totalAmount : Float;
+    totalPaid : Float;
+    totalDue : Float;
   };
 };

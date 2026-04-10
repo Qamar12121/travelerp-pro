@@ -15,4 +15,8 @@ module {
   public type InvoiceStatus = { #unpaid; #partial; #paid };
 
   public type VoucherType = { #receipt; #payment; #journal; #contra };
+
+  public type InvoiceType = { #booking; #manual; #proforma; #creditNote; #debitNote };
+
+  public type AdvanceType = { #received; #paid };
 };
