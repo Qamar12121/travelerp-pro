@@ -19,9 +19,9 @@ import AdvanceVouchersMixin "mixins/advance-vouchers-api";
 import UsersAgenciesMixin "mixins/users-agencies-api";
 import HotelVouchersMixin "mixins/hotel-vouchers-api";
 import NotificationsMixin "mixins/notifications-api";
-import Migration "migration";
 
-(with migration = Migration.run)
+
+
 actor {
   // Authorization state
   let accessControlState = AccessControl.initState();

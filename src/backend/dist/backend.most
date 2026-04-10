@@ -1,4 +1,4 @@
-// Version: 3.0.0
+// Version: 1.0.0
 type ActivityLogEntry__360061656 =
   {
     actorId : ?Text;
@@ -178,42 +178,6 @@ type NotificationType__908192046 =
     #refundCreated;
     #systemAlert
   };
-type OldAgency__355097191 =
-  {
-    agencyName : Text;
-    createdAt : Timestamp__301639476;
-    id : EntityId__892221652;
-    isActive : Bool;
-    logoUrl : ?Text;
-    ownerPrincipal : Principal;
-    totalAgents : Nat
-  };
-type OldAppSettings__893977289 =
-  {
-    var agencyName : Text;
-    var currency : Text;
-    var invoiceNextNo : Nat;
-    var invoicePrefix : Text;
-    var voucherNextNo : Nat;
-    var voucherPrefix : Text
-  };
-type OldInvoice__117248841 =
-  {
-    amount : Float;
-    bookingId : EntityId__892221652;
-    clientId : EntityId__892221652;
-    createdAt : Timestamp__301639476;
-    discountAmount : Float;
-    due : Float;
-    id : EntityId__892221652;
-    invoiceNo : Text;
-    invoiceType : InvoiceType__529703152;
-    notes : ?Text;
-    paid : Float;
-    remarks : ?Text;
-    status : InvoiceStatus__932546339;
-    taxAmount : Float
-  };
 type PaymentMethod__46913440 = {#bank; #cash};
 type Timestamp__301639476 = Int;
 type UserRole__1054455867 = {#admin; #guest; #user};
@@ -241,81 +205,7 @@ type Voucher__468983601 =
     voucherNo : Text;
     voucherType : VoucherType__561003931
   };
-actor ({
-  stable accessControlState :
-    {
-      var adminAssigned : Bool;
-      userRoles : Map__605269027<Principal, UserRole__1054455867>
-    };
-  stable activityLog :
-    {
-      var root :
-        Node__46230540<EntityId__892221652, ActivityLogEntry__360061656>;
-      var size : Nat__490723111
-    };
-  stable activityLogIdCounter : {var next : Nat};
-  stable advanceVouchers :
-    {
-      var root :
-        Node__46230540<EntityId__892221652, AdvanceVoucher__484432513>;
-      var size : Nat__490723111
-    };
-  in agencies : Map__605269027<EntityId__892221652, OldAgency__355097191>;
-  stable agencyIdCounter : {var next : Nat};
-  stable agentProfiles :
-    {
-      var root : Node__46230540<EntityId__892221652, AgentProfile__50395637>;
-      var size : Nat__490723111
-    };
-  in appSettings : OldAppSettings__893977289;
-  stable bookings :
-    {
-      var root : Node__46230540<EntityId__892221652, Booking__292638>;
-      var size : Nat__490723111
-    };
-  stable clientIdCounter : {var next : Nat};
-  stable clients :
-    {
-      var root : Node__46230540<EntityId__892221652, Client__1072228534>;
-      var size : Nat__490723111
-    };
-  stable hotelVoucherIdCounter : {var next : Nat};
-  stable hotelVouchers :
-    {
-      var root : Node__46230540<EntityId__892221652, HotelVoucher__129058512>;
-      var size : Nat__490723111
-    };
-  in invoices : Map__605269027<EntityId__892221652, OldInvoice__117248841>;
-  stable ledger :
-    {
-      var blockIndex : Nat__490723111;
-      var blocks : [var [var ?LedgerEntry__443656227]];
-      var elementIndex : Nat__490723111
-    };
-  stable notificationIdCounter : {var next : Nat};
-  stable notifications :
-    {
-      var root :
-        Node__46230540<EntityId__892221652, InAppNotification__120803294>;
-      var size : Nat__490723111
-    };
-  stable principalToAgency :
-    {
-      var root : Node__46230540<Principal, EntityId__892221652>;
-      var size : Nat__490723111
-    };
-  stable principalToAgent :
-    {
-      var root : Node__46230540<Principal, EntityId__892221652>;
-      var size : Nat__490723111
-    };
-  stable superAdminRef : {var superAdmin : ?Principal};
-  stable vouchers :
-    {
-      var root : Node__46230540<EntityId__892221652, Voucher__468983601>;
-      var size : Nat__490723111
-    }
-}, {
+actor {
   stable accessControlState :
     {
       var adminAssigned : Bool;
@@ -406,4 +296,4 @@ actor ({
       var root : Node__46230540<EntityId__892221652, Voucher__468983601>;
       var size : Nat__490723111
     }
-}) ;
+};
